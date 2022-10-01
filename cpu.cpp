@@ -10,12 +10,13 @@ using namespace std;
 // Holds decoded data
 //
 struct Data {
-    string opcode;
-    int rd, rs1, rs2;
-    string func3;
-    string func7;
-    unsigned int imm;
-    unsigned int long_imm;
+    uint8_t opcode = 0;
+    uint8_t rd = 0;
+    uint8_t rs1 = 0;
+    uint8_t rs2 = 0;
+    uint8_t func3 = 0;
+    uint8_t func7 = 0;
+    uint32_t imm = 0;
 };
 
 //
@@ -63,50 +64,54 @@ struct CPU {
     }
 };
 
-Data *decode(string instr){
+Data *decode(uint32_t instr){
     Data *data = new Data;
     
     // opcode
-    string opcode = "";
-    for (int i = 0; i<=6; i++) opcode += instr[i];
+    // 6 - 0
+    data->opcode = (uint8_t)(instr & 0b00000000000000000000000000111111);
     
     // rd
-    string rd = "";
-    for (int i = 7; i<=11; i++) rd += instr[i];
+    // 11 - 7
+    data->rd = (uint8_t)((instr & 0b00000000000000000000011111000000) >> 7);
     
     // funct3
-    string func3 = "";
-    for (int i = 12; i<=14; i++) func3 += instr[i];
+    // 14 - 12
+    data->func3 = (uint8_t)((instr & 0b00000000000000000011100000000000) >> 12);
     
     // rs1
-    string rs1 = "";
-    for (int i = 15; i<=19; i++) rs1 += instr[i];
+    // 19 - 15
+    data->rs1 = (uint8_t)((instr & 0b00000000000001111100000000000000) >> 15);
     
     // rs2
-    string rs2 = "";
-    for (int i = 20; i<=24; i++) rs2 += instr[i];
+    // 24 - 20
+    data->rs2 = (uint8_t)((instr & 0b0000000111110000000000000000000) >> 20);
     
     // func7
-    string func7 = "";
-    for (int i = 25; i<=31; i++) func7 += instr[i];
+    // 31 - 25
+    data->func7 = (uint8_t)((instr & 0b1111111000000000000000000000000) >> 25);
     
     // imm
-    string imm = "";
-    for (int i = 20; i<=31; i++) imm += instr[i];
+    // 31 - 20
+    data->imm = (uint32_t)((instr & 0b1111111111110000000000000000000) >> 20);
+    
+    // imm
+    //string imm = "";
+    //for (int i = 20; i<=31; i++) imm += instr[i];
     
     // long imm
-    string long_imm = "";
-    for (int i = 12; i<=31; i++) long_imm += instr[i];
+    //string long_imm = "";
+    //for (int i = 12; i<=31; i++) long_imm += instr[i];
     
     // Build the structure
-    data->opcode = opcode;
+    /*data->opcode = opcode;
     data->func3 = func3;
     data->func7 = func7;
     data->rd = stoi(rd);
     data->rs1 = stoi(rs1);
     data->rs2 = stoi(rs2);
     data->imm = stoul(imm, nullptr, 2);
-    data->long_imm = stoul(imm, nullptr, 2);
+    data->long_imm = stoul(imm, nullptr, 2);*/
     
     return data;
 }
@@ -115,37 +120,37 @@ Data *decode(string instr){
 // Handles all ALU operations
 //
 void alu(Data *data, CPU *cpu, bool isImmediate) {
-    int val1 = cpu->getRegister(data->rs1);
-    int val2 = 0;
+    uint32_t val1 = cpu->getRegister(data->rs1);
+    uint32_t val2 = 0;
     if (isImmediate) val2 = data->imm;
     else val2 = cpu->getRegister(data->rs2);
 
     // Add and sub (sub determined by func7)
-    if (data->func3 == "000") {
+    if (data->func3 == 0) {
         int result = val1 + val2;
         cpu->setRegister(data->rd, result);
         
     // Shift left
-    } else if (data->func3 == "001") {
+    } else if (data->func3 == 1) {
     
     // SLT (set less than)
-    } else if (data->func3 == "010") {
+    } else if (data->func3 == 2) {
     
     // SLTU (set less than unsigned)
-    } else if (data->func3 == "011") {
+    } else if (data->func3 == 3) {
     
     // XOR
-    } else if (data->func3 == "100") {
+    } else if (data->func3 == 4) {
     
     // SRL/SRA (shift right logic/arithmetic)
     // Logic vs arithmetic determined by func7
-    } else if (data->func3 == "101") {
+    } else if (data->func3 == 5) {
     
     // OR
-    } else if (data->func3 == "110") {
+    } else if (data->func3 == 6) {
     
     // AND
-    } else if (data->func3 == "111") {
+    } else if (data->func3 == 7) {
     
     }
 }
@@ -154,23 +159,23 @@ void alu(Data *data, CPU *cpu, bool isImmediate) {
 // Handles all branching operations
 //
 void branch(Data *data, CPU *cpu) {
-    // BEQ
-    if (data->func3 == "000") {
+    // BEQ (000)
+    if (data->func3 == 0) {
     
-    // BNE
-    } else if (data->func3 == "001") {
+    // BNE (001)
+    } else if (data->func3 == 1) {
     
-    // BLT
-    } else if (data->func3 == "100") {
+    // BLT (100)
+    } else if (data->func3 == 4) {
     
-    // BGE
-    } else if (data->func3 == "101") {
+    // BGE (101)
+    } else if (data->func3 == 5) {
     
-    // BLTU
-    } else if (data->func3 == "110") {
+    // BLTU (110)
+    } else if (data->func3 == 6) {
     
-    // BGEU
-    } else if (data->func3 == "111") {
+    // BGEU (111)
+    } else if (data->func3 == 7) {
     
     }
 }
@@ -181,26 +186,31 @@ void execute(Data *data, CPU *cpu) {
     // First, determine the opcode
     //
     // ALU instruction, R-Type and I-Type
-    if (data->opcode == "0010011" || data->opcode == "0110011") {
-        if (data->opcode == "0110011") {
+    // R-Type: 0010011 | I-Type: 0110011
+    if (data->opcode == 0x13 || data->opcode == 0x33) {
+        if (data->opcode == 0x33) {
             alu(data, cpu, false);
         } else {
             alu(data, cpu, true);
         }
     
     // LUI (load upper immediate), AUIPC, JAL
-    } else if (data->opcode == "0110111") {
+    // OP: 0110111
+    } else if (data->opcode == 0x37) {
     
     // All the branch instructions
-    } else if (data->opcode == "1100011") {
+    // OP: 1100011
+    } else if (data->opcode == 0x63) {
         branch(data, cpu);
     
     // All the load instructions
-    } else if (data->opcode == "0000011") {
+    // LD: 0000011
+    } else if (data->opcode == 0x03) {
     
         
     // All the store instructions
-    } else if (data->opcode == "0100011") {
+    // ST: 0100011
+    } else if (data->opcode == 0x23) {
     
     
     // Otherwise, invalid opcode
@@ -211,36 +221,24 @@ void execute(Data *data, CPU *cpu) {
 }
 
 int main() {
-    string instr1 = "";
-    string instr2 = "";
-    /*instr1 += "0000000";
-    instr1 += "00000";
-    instr1 += "00000";
-    instr1 += "000";
-    instr1 += "00001";
-    instr1 += "0110011";*/    // ADD X1, X0, X0
+    // Instructions
+    // ADD x1, X0, X0
+    // 0000000 00000 00000 000 00001 0110011
+    // LE: 0000 0000 0000 0000 0000 0000 1011 0011
+    uint32_t instr1 = 0x000000B3;
     
-    // ADD X1, X0, X0
-    instr1 += "0110011";
-    instr1 += "00001";
-    instr1 += "000";
-    instr1 += "00000";
-    instr1 += "00000";
-    instr1 += "0000000";
-    
-    instr2 += "0010011";         // ADDI X2, X0, 10
-    instr2 += "00010";
-    instr2 += "000";
-    instr2 += "00000";
-    instr2 += "000000001010";
+    // ADDI X2, X0, 10
+    // 000000001010 00000 000 00010 0010011
+    // LE: 0000 0000 1010 0000 0000 0001 0001 0011
+    uint32_t instr2 = 0x00A00113;
     
     Data *d1 = decode(instr1);
-    std::cout << "OP: " << d1->opcode << " | func3: " << d1->func3 << " | func7: " << d1->func7;
-    std::cout << " | rd: " << d1->rd << " | rs1: " << d1->rs1 << " | rs2: " << d1->rs2 << " | imm: " << d1->imm << std::endl;
+    printf("OP: %X | func3: %X | func7: %X |", d1->opcode, d1->func3, d1->func7);
+    printf(" rd: %d | rs1: %d | rs2: %d | imm: %d\n", d1->rd, d1->rs1, d1->rs2, d1->imm);
     
     Data *d2 = decode(instr2);
-    std::cout << "OP: " << d2->opcode << " | func3: " << d2->func3 << " | func7: " << d2->func7;
-    std::cout << " | rd: " << d2->rd << " | rs1: " << d2->rs1 << " | rs2: " << d2->rs2 << " | imm: " << d2->imm << std::endl;
+    printf("OP: %X | func3: %X | func7: %X |", d2->opcode, d2->func3, d2->func7);
+    printf(" rd: %d | rs1: %d | rs2: %d | imm: %d\n", d2->rd, d2->rs1, d2->rs2, d2->imm);
     
     // Execute and test
     CPU *cpu = new CPU;
