@@ -95,24 +95,6 @@ Data *decode(uint32_t instr){
     // 31 - 20
     data->imm = (uint32_t)((instr & 0b1111111111110000000000000000000) >> 20);
     
-    // imm
-    //string imm = "";
-    //for (int i = 20; i<=31; i++) imm += instr[i];
-    
-    // long imm
-    //string long_imm = "";
-    //for (int i = 12; i<=31; i++) long_imm += instr[i];
-    
-    // Build the structure
-    /*data->opcode = opcode;
-    data->func3 = func3;
-    data->func7 = func7;
-    data->rd = stoi(rd);
-    data->rs1 = stoi(rs1);
-    data->rs2 = stoi(rs2);
-    data->imm = stoul(imm, nullptr, 2);
-    data->long_imm = stoul(imm, nullptr, 2);*/
-    
     return data;
 }
 
