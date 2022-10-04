@@ -77,7 +77,7 @@ Data *decode(uint32_t instr){
     
     // funct3
     // 14 - 12
-    data->func3 = (uint8_t)((instr & 0b00000000000000000011100000000000) >> 12);
+    data->func3 = (uint8_t)((instr & 0b000000000000000000111000000000000) >> 12);
     
     // rs1
     // 19 - 15
@@ -109,30 +109,44 @@ void alu(Data *data, CPU *cpu, bool isImmediate) {
 
     // Add and sub (sub determined by func7)
     if (data->func3 == 0) {
-        int result = val1 + val2;
+        uint32_t result = val1 + val2;
         cpu->setRegister(data->rd, result);
         
     // Shift left
     } else if (data->func3 == 1) {
+        uint32_t result = val1 >> val2;
+        cpu->setRegister(data->rd, result);
     
     // SLT (set less than)
     } else if (data->func3 == 2) {
+        uint32_t result = val1 + val2;
+        cpu->setRegister(data->rd, result);
     
     // SLTU (set less than unsigned)
     } else if (data->func3 == 3) {
+        uint32_t result = val1 + val2;
+        cpu->setRegister(data->rd, result);
     
     // XOR
     } else if (data->func3 == 4) {
+        uint32_t result = val1 ^ val2;
+        cpu->setRegister(data->rd, result);
     
     // SRL/SRA (shift right logic/arithmetic)
     // Logic vs arithmetic determined by func7
     } else if (data->func3 == 5) {
+        uint32_t result = val1 >> val2;
+        cpu->setRegister(data->rd, result);
     
     // OR
     } else if (data->func3 == 6) {
+        uint32_t result = val1 | val2;
+        cpu->setRegister(data->rd, result);
     
     // AND
     } else if (data->func3 == 7) {
+        uint32_t result = val1 & val2;
+        cpu->setRegister(data->rd, result);
     
     }
 }
@@ -141,17 +155,32 @@ void alu(Data *data, CPU *cpu, bool isImmediate) {
 // Handles all branching operations
 //
 void branch(Data *data, CPU *cpu) {
+    uint32_t val1 = cpu->getRegister(data->rs1);
+    uint32_t val2 = cpu->getRegister(data->rs2);
+    
     // BEQ (000)
     if (data->func3 == 0) {
+        if (val1 == val2) {
+            // Update PC
+        }
     
     // BNE (001)
     } else if (data->func3 == 1) {
+        if (val1 != val2) {
+            // Update PC
+        }
     
     // BLT (100)
     } else if (data->func3 == 4) {
+        if (val1 < val2) {
+            // Update PC
+        }
     
     // BGE (101)
     } else if (data->func3 == 5) {
+        if (val1 >= val2) {
+            // Update PC
+        }
     
     // BLTU (110)
     } else if (data->func3 == 6) {
@@ -202,6 +231,95 @@ void execute(Data *data, CPU *cpu) {
     }
 }
 
+void print_instruction(Data *data) {
+    
+    // First, print instruction type
+    switch (data->opcode) {
+        // R-Types
+        case 0b0110011: {
+            std::cout << "R-Type" << std::endl;
+            printf("Func3: %X | Func7: %X\n", data->func3, data->func7);
+            
+            std::string instr_str = "";
+            switch (data->func3) {
+                case 0: {
+                    if (data->func7 == 32) instr_str = "sub";
+                    else instr_str = "add";
+                } break;
+                case 1: instr_str = "sll"; break;
+                case 2: instr_str = "slt"; break;
+                case 3: instr_str = "sltu"; break;
+                case 4: instr_str = "xor"; break;
+                case 5: {
+                    if (data->func7 == 32) instr_str = "sra";
+                    else instr_str = "srl";
+                } break;
+                case 6: instr_str = "or"; break;
+                case 7: instr_str = "and"; break;
+                
+                default: {}
+            }
+            instr_str += " x" + to_string(data->rs1) + ", x" + to_string(data->rs2) + ", x" + to_string(data->rs2);
+            std::cout << instr_str << std::endl;
+        } break;
+        
+        // I-Types
+        case 0b0010011: {
+            std::cout << "I-Type" << std::endl;
+            printf("Func3: %X\n", data->func3);
+            std::cout << "Imm: " << data->imm << std::endl;
+            
+            std::string instr_str = "";
+            switch (data->func3) {
+                case 0: instr_str = "addi"; break;
+                case 1: instr_str = "slli"; break;
+                case 2: instr_str = "slti"; break;
+                case 3: instr_str = "sltui"; break;
+                case 4: instr_str = "xori"; break;
+                case 5: {
+                    if (data->func7 == 32) instr_str = "srai";
+                    else instr_str = "srli";
+                } break;
+                case 6: instr_str = "ori"; break;
+                case 7: instr_str = "andi"; break;
+                
+                default: {}
+            }
+            instr_str += " x" + to_string(data->rd) + ", x" + to_string(data->rs1) + ", ";
+            if (data->func3 == 1 || data->func3 == 5) instr_str += to_string(data->rs2);
+            else instr_str += to_string(data->imm);
+            std::cout << instr_str << std::endl;
+        } break;
+        
+        // B-Types
+        case 0x23:
+        case 0x2F: {
+            std::cout << "B-Type" << std::endl;
+            printf("Func3: %X\n", data->func3);
+            std::cout << "Imm: " << data->imm << std::endl;
+            
+            std::string instr_str = "";
+            switch (data->func3) {
+                case 0: instr_str = "beq"; break;
+                case 1: instr_str = "bne"; break;
+                case 4: instr_str = "blt"; break;
+                case 5: instr_str = "bge"; break;
+                case 6: instr_str = "bltu"; break;
+                case 7: instr_str = "bgeu"; break;
+                
+                default: {}
+            }
+            instr_str += " x" + to_string(data->rd) + ", x" + to_string(data->rs1) + ", SOMEWHERE";
+            std::cout << instr_str << std::endl;
+        } break;
+        
+        default: {}
+    }
+    
+    std::cout << "-----------------------------" << std::endl;
+}
+
+// TODO: Print instruction type rather than just instruction
 int main() {
     // Instructions
     // ADD x1, X0, X0
@@ -214,20 +332,58 @@ int main() {
     // LE: 0000 0000 1010 0000 0000 0001 0001 0011
     uint32_t instr2 = 0x00A00113;
     
-    Data *d1 = decode(instr1);
-    printf("OP: %X | func3: %X | func7: %X |", d1->opcode, d1->func3, d1->func7);
-    printf(" rd: %d | rs1: %d | rs2: %d | imm: %d\n", d1->rd, d1->rs1, d1->rs2, d1->imm);
+    int instr_count = 26;
+    uint32_t instr_memory[] = {
+        0x00a00093,
+        0x01400113,
+        0x00a12193,
+        0x00a13213,
+        0x00a14293,
+        0x00a16313,
+        0x00a17393,
+        0x00a11413,
+        0x00a15493,
+        0x40a15513,
+        0x002081b3,
+        0x40208233,
+        0x002092b3,
+        0x0020d333,
+        0x4020d3b3,
+        0x0020f433,
+        0x0020e4b3,
+        0x0020c533,
+        0x0020a5b3,
+        0x0020b633,
+        0x00209463,
+        0xfadff06f,
+        0x00208463,
+        0xfa5ff06f,
+        0x0020d463,
+        0xf9dff06f,
+        0x0020c463,
+        0xf95ff06f,
+        0x0020f463,
+        0xf8dff06f,
+        0x0020e463,
+        0xf85ff06f
+    };
     
-    Data *d2 = decode(instr2);
-    printf("OP: %X | func3: %X | func7: %X |", d2->opcode, d2->func3, d2->func7);
-    printf(" rd: %d | rs1: %d | rs2: %d | imm: %d\n", d2->rd, d2->rs1, d2->rs2, d2->imm);
+    //Data *d1 = decode(instr1);
+    //print_instruction(d1);
+   // 
+    //Data *d2 = decode(instr2);
+    //print_instruction(d2);
+    for (int i = 0; i<instr_count; i++) {
+        Data *d = decode(instr_memory[i]);
+        print_instruction(d);
+    }
     
     // Execute and test
-    CPU *cpu = new CPU;
-    execute(d1, cpu);
-    execute(d2, cpu);
+    //CPU *cpu = new CPU;
+    //execute(d1, cpu);
+    //execute(d2, cpu);
     
-    cpu->debugRegisters();
+    //cpu->debugRegisters();
     
     return 0;
 }
