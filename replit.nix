@@ -1,6 +1,7 @@
 { pkgs }: {
 	deps = [
-		pkgs.cmake
+		pkgs.unixtools.util-linux
+  pkgs.cmake
   pkgs.clang_12
 		pkgs.ccls
 		pkgs.gdb

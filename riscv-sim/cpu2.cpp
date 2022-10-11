@@ -442,22 +442,63 @@ void print_instruction(Data *data) {
 int main() {
     
     std::vector<uint32_t> instr_memory;
-    std::ifstream reader("../out", std::ifstream::binary);
-    if (!reader.is_open()) {
-        std::cerr << "Error: Unable to open binary file. Make sure it is assembled." << std::endl;
-        return 1;
-    }
-
-    while (!reader.eof()) {
-        uint8_t *buffer = new uint8_t[4];
-        buffer[0] = reader.get();
-        buffer[1] = reader.get();
-        buffer[2] = reader.get();
-        buffer[3] = reader.get();
-
-        uint32_t instr = (uint32_t)buffer[3] << 24 | (uint32_t)buffer[2] << 16 | (uint32_t)buffer[1] << 8 | (uint32_t)buffer[0];
-        instr_memory.push_back(instr);
-    }
+    
+    instr_memory.push_back(0x00a00093);     // addi x1, x0, 10
+    instr_memory.push_back(0x01400113);     // addi x2, x0, 20
+    instr_memory.push_back(0x00a12193);     // slti x3, x2, 10
+    instr_memory.push_back(0x00a13213);     // sltiu x4, x2, 10
+    instr_memory.push_back(0x00a14293);     // xori x5, x2, 10
+    instr_memory.push_back(0x00a16313);     // ori x6, x2, 10
+    instr_memory.push_back(0x00a17393);     // andi x7, x2, 10
+    instr_memory.push_back(0x00a11413);     // slli x8, x2, 10
+    instr_memory.push_back(0x00a15493);     // srli x9, x2, 10
+    instr_memory.push_back(0x40a15513);     // srai x10, x2, 10
+    
+    instr_memory.push_back(0x002081b3);     // add x3, x1, x2
+    instr_memory.push_back(0x40208233);     // sub x4, x1, x2
+    instr_memory.push_back(0x002092b3);     // sll x5, x1, x2
+    instr_memory.push_back(0x0020d333);     // srl x6, x1, x2
+    instr_memory.push_back(0x4020d3b3);     // sra x7, x1, x2
+    instr_memory.push_back(0x0020f433);     // and x8, x1, x2
+    instr_memory.push_back(0x0020e4b3);     // or x9, x1, x2
+    instr_memory.push_back(0x0020c533);     // xor x10, x1, x2
+    instr_memory.push_back(0x0020a5b3);     // slt x11, x1, x2
+    instr_memory.push_back(0x0020b633);     //sltu x12, x1, x2
+    
+    instr_memory.push_back(0x00208063);     // beq x1, x2, LOOP
+    instr_memory.push_back(0xfe209ee3);     // bne x1, x2, LOOP
+    instr_memory.push_back(0xfe20cce3);     // blt x1, x2, LOOP
+    instr_memory.push_back(0xfe20dae3);     // bge x1, x2, LOOP
+    instr_memory.push_back(0xfe20e8e3);     // bltu x1, x2, LOOP
+    instr_memory.push_back(0xfe20f6e3);     // bgeu x1, x2, LOOP
+    
+    instr_memory.push_back(0x00012083);     // lw x1, 0(x2)
+    instr_memory.push_back(0x00a1a103);     // lw x2, 10(x3)
+    instr_memory.push_back(0x01422183);     // lw x3, 20(x4)
+    instr_memory.push_back(0x00e7a203);     // lw x4, 14(x15)
+    instr_memory.push_back(0x00f0a503);     // lw x10, 15(x1)
+    
+    instr_memory.push_back(0x00ab2023);     // sw x10, 0(x22)
+    instr_memory.push_back(0x014f2523);     // sw x20, 10(x30)
+    instr_memory.push_back(0x00d22a23);     // sw x13, 20(x4)
+    instr_memory.push_back(0x00e7a723);     // sw x14, 14(x15)
+    instr_memory.push_back(0x0010a7a3);     // sw x1, 15(x1)
+    
+    instr_memory.push_back(0x007e40b7);     // lui x1, 2020
+    instr_memory.push_back(0x007e5137);     // lui x2, 2021
+    instr_memory.push_back(0x007e61b7);     // lui x3, 2022
+    
+    instr_memory.push_back(0x000bc617);     // auipc x12, 188
+    instr_memory.push_back(0x0012bb17);     // auipc x22, 299
+    instr_memory.push_back(0x0018f797);     // auipc x15, 399
+    
+    instr_memory.push_back(0x0080056f);     // jal x10, BOOT1
+    instr_memory.push_back(0xffdff5ef);     // jal x11, BOOT2
+    
+    instr_memory.push_back(0x065500e7);     // jalr x1, x10, 101
+    instr_memory.push_back(0x0c960167);     // jalr x2, x12, 201
+    
+    
     
     for (int i = 0; i<instr_memory.size(); i++) {
         Data *d = decode(instr_memory[i]);
