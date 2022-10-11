@@ -439,10 +439,15 @@ void print_instruction(Data *data) {
 }
 
 // TODO: Print instruction type rather than just instruction
-int main() {
+int main(int argc, char **argv) {
+    if (argc == 1) {
+        std::cerr << "Error: Please specify a binary file!" << std::endl;
+        return 1;
+    }
+    std::string input = argv[1];
     
     std::vector<uint32_t> instr_memory;
-    std::ifstream reader("../out", std::ifstream::binary);
+    std::ifstream reader(input, std::ifstream::binary);
     if (!reader.is_open()) {
         std::cerr << "Error: Unable to open binary file. Make sure it is assembled." << std::endl;
         return 1;
