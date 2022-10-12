@@ -260,20 +260,21 @@ void execute(Data *data, CPU *cpu) {
     }
 }
 
-void print_signals(int branch, int mem_read, int mem2reg, int aluop, int mem_write, int alu_src, int reg_write) {
+void print_signals(int branch, int mem_read, int mem2reg, int aluop, int mem_write, int alu_src, int reg_write, int rs1_src, int pc_write) {
     std::cout << "Branch: " << branch << " | MemRead: " << mem_read << " | MemToRegister: " << mem2reg;
     std::cout << " | ALUop: " << aluop << std::endl;
     std::cout << "MemWrite: " << mem_write << " | ALUsrc: " << alu_src << " | RegWrite: " << reg_write;
+    std::cout << " | RS1src: " << rs1_src;
     std::cout << std::endl;
     
     // The branch mux
-    std::cout << "PC+4: " << int(!branch) << " | PC+Imm: " << int(branch) << std::endl;
+    std::cout << "PC+4: " << int(!branch) << " | PC+Imm: " << int(branch && !pc_write) << " | PC=rd: " << int(pc_write) << std::endl;
     
     // Imm mux
     std::cout << "Read Data 2: " << int(!alu_src) << " | Read Imm: " << int(alu_src) << std::endl;
     
     // Store mux
-    std::cout << "Write ALU Result: " << int(!mem2reg && reg_write) << " | Write Memory Data: " << int(mem2reg && reg_write) << std::endl;
+    std::cout << "Writeback ALU Result: " << int(!mem2reg && reg_write) << " | Writeback Memory Data: " << int(mem2reg && reg_write) << std::endl;
 }
 
 void print_instruction(Data *data) {
@@ -289,7 +290,7 @@ void print_instruction(Data *data) {
             
             std::cout << "Rd: " << to_string(data->rd) << " | Rs1: " << to_string(data->rs1);
             std::cout << " | Rs2: " << to_string(data->rs2) << std::endl;
-            print_signals(0, 0, 0, data->func3, 0, 0, 1);
+            print_signals(0, 0, 0, data->func3, 0, 0, 1, 0, 0);
             std::cout << "Invert: " << int(data->func7 == 32) << std::endl;
             
             std::string instr_str = "";
@@ -329,7 +330,7 @@ void print_instruction(Data *data) {
             
             std::cout << "Signed Extended Immediate: " << imm << std::endl;
             std::cout << "Rd: " << to_string(data->rd) << " | Rs1: " << to_string(data->rs1) << std::endl;
-            print_signals(0, 0, 0, data->func3, 0, 1, 1);
+            print_signals(0, 0, 0, data->func3, 0, 1, 1, 0, 0);
             
             std::string instr_str = "";
             switch (data->func3) {
@@ -360,6 +361,9 @@ void print_instruction(Data *data) {
             printf("Func3: %X\n", data->func3);
             std::cout << "Imm: " << data->imm_i << std::endl;
             
+            std::cout << "Rd: " << to_string(data->rd) << " | Rs1: " << to_string(data->rs1) << "| Rs2: PC" << std::endl;
+            print_signals(1, 0, 0, 000, 0, 1, 1, 1, 1);
+            
             std::string instr_str = "jalr ";
             instr_str += " x" + to_string(data->rd) + ", x" + to_string(data->rs1) + ", ";
             instr_str += to_string(data->imm_i);
@@ -375,7 +379,7 @@ void print_instruction(Data *data) {
             std::cout << "Branch Destination: " << (signed int)data->imm_b << std::endl;
             
             std::cout << "Rs1: " << to_string(data->rs1) << " | Rs2: " << to_string(data->rs2) << std::endl;
-            print_signals(1, 0, 0, 000, 0, 0, 0);
+            print_signals(1, 0, 0, 000, 0, 0, 0, 0, 0);
             
             std::string instr_str = "";
             switch (data->func3) {
@@ -397,12 +401,12 @@ void print_instruction(Data *data) {
         // Loads
         //
         case 0b0000011: {
-            std::cout << "I-Type (Loads)" << std::endl;
-            printf("Func3: %X\n", data->func3);
+            std::cout << "I-Type (Load)" << std::endl;
+            printf("Length Opcode: %X\n", data->func3);
             std::cout << "Offset: " << data->imm_i << std::endl;
             
             std::cout << "Rd: " << to_string(data->rd) << " | Rs1: " << to_string(data->rs1) << std::endl;
-            print_signals(0, 1, 1, 000, 0, 1, 1);
+            print_signals(0, 1, 1, 000, 0, 1, 1, 0, 0);
             
             std::string instr_str = "lw x" + to_string(data->rd) + ", ";
             instr_str += to_string(data->imm_i) + "(x";
@@ -418,8 +422,11 @@ void print_instruction(Data *data) {
             uint32_t imm = data->imm_s;
         
             std::cout << "S-Type (Store)" << std::endl;
-            printf("Func3: %X\n", data->func3);
+            printf("Length Opcode: %X\n", data->func3);
             std::cout << "Offset: " << imm << std::endl;
+            
+            std::cout << "Rs1: " << to_string(data->rs1) << " | Rs2: " << to_string(data->rs2) << std::endl;
+            print_signals(0, 0, 0, 000, 1, 1, 0, 0, 0);
             
             std::string instr_str = "sw x" + to_string(data->rs2) + ", ";
             instr_str += to_string(imm) + "(x";
@@ -433,7 +440,10 @@ void print_instruction(Data *data) {
         //
         case 0b0110111: {
             std::cout << "U-Type (LUI)" << std::endl;
-            std::cout << "Offset: " << data->imm_u << std::endl;
+            std::cout << "Upper Immediate Value: " << data->imm_u << std::endl;
+            
+            std::cout << "Rd: " << to_string(data->rd) << std::endl;
+            print_signals(0, 0, 0, 000, 0, 1, 1, 0, 0);
             
             std::string instr_str = "lui x" + to_string(data->rd) + ", ";
             instr_str += to_string(data->imm_u);
@@ -446,7 +456,10 @@ void print_instruction(Data *data) {
         //
         case 0b0010111: {
             std::cout << "U-Type (AUIPC)" << std::endl;
-            std::cout << "Offset: " << data->imm_u << std::endl;
+            std::cout << "Upper Immediate Value: " << data->imm_u << std::endl;
+            
+            std::cout << "Rd: " << to_string(data->rd) << " | Rs1: PC" << std::endl;
+            print_signals(0, 0, 0, 000, 0, 1, 1, 1, 0);
             
             std::string instr_str = "auipc x" + to_string(data->rd) + ", ";
             instr_str += to_string(data->imm_u);
@@ -460,7 +473,10 @@ void print_instruction(Data *data) {
             int32_t imm = (int32_t)data->imm_j;
         
             std::cout << "J-Type (JAL)" << std::endl;
-            std::cout << "Offset: " << imm << std::endl;
+            std::cout << "Signed Extended Offset: " << imm << std::endl;
+            
+            std::cout << "Rd: " << to_string(data->rd) << " | Rs1: PC" << std::endl;
+            print_signals(1, 0, 0, 000, 0, 1, 1, 1, 1);
             
             std::string instr_str = "jal x" + to_string(data->rd) + ", ";
             instr_str += to_string(imm);
