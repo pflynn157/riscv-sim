@@ -260,6 +260,22 @@ void execute(Data *data, CPU *cpu) {
     }
 }
 
+void print_signals(int branch, int mem_read, int mem2reg, int aluop, int mem_write, int alu_src, int reg_write) {
+    std::cout << "Branch: " << branch << " | MemRead: " << mem_read << " | MemToRegister: " << mem2reg;
+    std::cout << " | ALUop: " << aluop << std::endl;
+    std::cout << "MemWrite: " << mem_write << " | ALUsrc: " << alu_src << " | RegWrite: " << reg_write;
+    std::cout << std::endl;
+    
+    // The branch mux
+    std::cout << "PC+4: " << int(!branch) << " | PC+Imm: " << int(branch) << std::endl;
+    
+    // Imm mux
+    std::cout << "Read Data 2: " << int(!alu_src) << " | Read Imm: " << int(alu_src) << std::endl;
+    
+    // Store mux
+    std::cout << "Write ALU Result: " << int(!mem2reg && reg_write) << " | Write Memory Data: " << int(mem2reg && reg_write) << std::endl;
+}
+
 void print_instruction(Data *data) {
     
     // First, print instruction type
@@ -269,7 +285,12 @@ void print_instruction(Data *data) {
         //
         case 0b0110011: {
             std::cout << "R-Type" << std::endl;
-            printf("Func3: %X | Func7: %X\n", data->func3, data->func7);
+            printf("ALU Opcode: %X\n", data->func3);
+            
+            std::cout << "Rd: " << to_string(data->rd) << " | Rs1: " << to_string(data->rs1);
+            std::cout << " | Rs2: " << to_string(data->rs2) << std::endl;
+            print_signals(0, 0, 0, data->func3, 0, 0, 1);
+            std::cout << "Invert: " << int(data->func7 == 32) << std::endl;
             
             std::string instr_str = "";
             switch (data->func3) {
@@ -299,8 +320,16 @@ void print_instruction(Data *data) {
         //
         case 0b0010011: {
             std::cout << "I-Type" << std::endl;
-            printf("Func3: %X\n", data->func3);
-            std::cout << "Imm: " << data->imm_i << std::endl;
+            printf("ALU Opcode: %X\n", data->func3);
+            
+            uint32_t imm = data->imm_i;
+            if (data->func3 == 1 || data->func3 == 5) {
+                imm = data->rs2;
+            }
+            
+            std::cout << "Signed Extended Immediate: " << imm << std::endl;
+            std::cout << "Rd: " << to_string(data->rd) << " | Rs1: " << to_string(data->rs1) << std::endl;
+            print_signals(0, 0, 0, data->func3, 0, 1, 1);
             
             std::string instr_str = "";
             switch (data->func3) {
@@ -319,8 +348,7 @@ void print_instruction(Data *data) {
                 default: {}
             }
             instr_str += " x" + to_string(data->rd) + ", x" + to_string(data->rs1) + ", ";
-            if (data->func3 == 1 || data->func3 == 5) instr_str += to_string(data->rs2);
-            else instr_str += to_string(data->imm_i);
+            instr_str += to_string(imm);
             std::cout << instr_str << std::endl;
         } break;
         
@@ -343,8 +371,11 @@ void print_instruction(Data *data) {
         //
         case 0b1100011: {
             std::cout << "B-Type" << std::endl;
-            printf("Func3: %X\n", data->func3);
-            std::cout << "Imm: " << (signed int)data->imm_b << std::endl;
+            printf("Branch Opcode: %X\n", data->func3);
+            std::cout << "Branch Destination: " << (signed int)data->imm_b << std::endl;
+            
+            std::cout << "Rs1: " << to_string(data->rs1) << " | Rs2: " << to_string(data->rs2) << std::endl;
+            print_signals(1, 0, 0, 000, 0, 0, 0);
             
             std::string instr_str = "";
             switch (data->func3) {
@@ -357,7 +388,8 @@ void print_instruction(Data *data) {
                 
                 default: {}
             }
-            instr_str += " x" + to_string(data->rs1) + ", x" + to_string(data->rs2) + ", SOMEWHERE";
+            instr_str += " x" + to_string(data->rs1) + ", x" + to_string(data->rs2) + ", ";
+            instr_str += to_string((signed int)data->imm_b);
             std::cout << instr_str << std::endl;
         } break;
         
@@ -368,6 +400,9 @@ void print_instruction(Data *data) {
             std::cout << "I-Type (Loads)" << std::endl;
             printf("Func3: %X\n", data->func3);
             std::cout << "Offset: " << data->imm_i << std::endl;
+            
+            std::cout << "Rd: " << to_string(data->rd) << " | Rs1: " << to_string(data->rs1) << std::endl;
+            print_signals(0, 1, 1, 000, 0, 1, 1);
             
             std::string instr_str = "lw x" + to_string(data->rd) + ", ";
             instr_str += to_string(data->imm_i) + "(x";
