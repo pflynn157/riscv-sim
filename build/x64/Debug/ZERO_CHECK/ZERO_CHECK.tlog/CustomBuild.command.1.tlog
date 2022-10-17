@@ -1,0 +1,10 @@
+^C:\USERS\PATRICK\PROJECTS\RISCV-SIM\BUILD\CMAKEFILES\44124A1EB2FF8643EBCADAF7B03B7375\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/patrick/Projects/riscv-sim -BC:/Users/patrick/Projects/riscv-sim/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/patrick/Projects/riscv-sim/build/riscv-sim.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

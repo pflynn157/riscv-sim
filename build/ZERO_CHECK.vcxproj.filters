@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\patrick\Projects\riscv-sim\build\CMakeFiles\44124a1eb2ff8643ebcadaf7b03b7375\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{B4B2519A-5621-39C7-94C6-88DCA73055E0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

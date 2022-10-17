@@ -1,0 +1,3 @@
+C:/Users/patrick/Projects/riscv-sim/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/patrick/Projects/riscv-sim/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/patrick/Projects/riscv-sim/build/src/CMakeFiles/cpu.dir
