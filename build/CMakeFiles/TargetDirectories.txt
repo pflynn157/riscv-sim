@@ -1,6 +1,0 @@
-/home/patrick/Projects/riscv-sim/build/CMakeFiles/memgen.dir
-/home/patrick/Projects/riscv-sim/build/CMakeFiles/edit_cache.dir
-/home/patrick/Projects/riscv-sim/build/CMakeFiles/rebuild_cache.dir
-/home/patrick/Projects/riscv-sim/build/src/CMakeFiles/cpu.dir
-/home/patrick/Projects/riscv-sim/build/src/CMakeFiles/edit_cache.dir
-/home/patrick/Projects/riscv-sim/build/src/CMakeFiles/rebuild_cache.dir
