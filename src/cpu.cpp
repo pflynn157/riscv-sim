@@ -61,8 +61,7 @@ void CPU::execute(State *state) {
         src2 = getRegister(data->rs2);
     } else {
         if (data->mem_write) {
-            //src2 = data->imm_s;
-            src2 = 2816;
+            src2 = data->imm_s;
             data->aluop = 0;
         } else {
             src2 = data->imm_i;

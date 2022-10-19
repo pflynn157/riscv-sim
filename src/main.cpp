@@ -75,7 +75,7 @@ void print_instruction(Data *data) {
             std::cout << "I-Type" << std::endl;
             printf("ALU Opcode: %X\n", data->func3);
             
-            uint32_t imm = data->imm_i;
+            uint32_t imm = data->imm;
             if (data->func3 == 1 || data->func3 == 5) {
                 imm = data->rs2;
             }
@@ -111,14 +111,14 @@ void print_instruction(Data *data) {
         case 0b1100111: {
             std::cout << "I-Type (JALR)" << std::endl;
             printf("Func3: %X\n", data->func3);
-            std::cout << "Imm: " << data->imm_i << std::endl;
+            std::cout << "Imm: " << data->imm << std::endl;
             
             std::cout << "Rd: " << to_string(data->rd) << " | Rs1: " << to_string(data->rs1) << "| Rs2: PC" << std::endl;
             print_signals(data);
             
             std::string instr_str = "jalr ";
             instr_str += " x" + to_string(data->rd) + ", x" + to_string(data->rs1) + ", ";
-            instr_str += to_string(data->imm_i);
+            instr_str += to_string(data->imm);
             std::cout << instr_str << std::endl;
         } break;
         
@@ -128,7 +128,7 @@ void print_instruction(Data *data) {
         case 0b1100011: {
             std::cout << "B-Type" << std::endl;
             printf("Branch Opcode: %X\n", data->func3);
-            std::cout << "Branch Destination: " << (signed int)data->imm_b << std::endl;
+            std::cout << "Branch Destination: " << (signed int)data->imm << std::endl;
             
             std::cout << "Rs1: " << to_string(data->rs1) << " | Rs2: " << to_string(data->rs2) << std::endl;
             print_signals(data);
@@ -155,7 +155,7 @@ void print_instruction(Data *data) {
         case 0b0000011: {
             std::cout << "I-Type (Load)" << std::endl;
             printf("Length Opcode: %X\n", data->func3);
-            std::cout << "Offset: " << data->imm_i << std::endl;
+            std::cout << "Offset: " << data->imm << std::endl;
             
             std::cout << "Rd: " << to_string(data->rd) << " | Rs1: " << to_string(data->rs1) << std::endl;
             print_signals(data);
@@ -171,7 +171,7 @@ void print_instruction(Data *data) {
         // S-Type
         //
         case 0b0100011: {
-            uint32_t imm = data->imm_s;
+            uint32_t imm = data->imm;
         
             std::cout << "S-Type (Store)" << std::endl;
             printf("Length Opcode: %X\n", data->func3);
@@ -192,13 +192,13 @@ void print_instruction(Data *data) {
         //
         case 0b0110111: {
             std::cout << "U-Type (LUI)" << std::endl;
-            std::cout << "Upper Immediate Value: " << data->imm_u << std::endl;
+            std::cout << "Upper Immediate Value: " << data->imm << std::endl;
             
             std::cout << "Rd: " << to_string(data->rd) << std::endl;
             print_signals(data);
             
             std::string instr_str = "lui x" + to_string(data->rd) + ", ";
-            instr_str += to_string(data->imm_u);
+            instr_str += to_string(data->imm);
             std::cout << instr_str << std::endl;
         } break;
         
@@ -208,13 +208,13 @@ void print_instruction(Data *data) {
         //
         case 0b0010111: {
             std::cout << "U-Type (AUIPC)" << std::endl;
-            std::cout << "Upper Immediate Value: " << data->imm_u << std::endl;
+            std::cout << "Upper Immediate Value: " << data->imm << std::endl;
             
             std::cout << "Rd: " << to_string(data->rd) << " | Rs1: PC" << std::endl;
             print_signals(data);
             
             std::string instr_str = "auipc x" + to_string(data->rd) + ", ";
-            instr_str += to_string(data->imm_u);
+            instr_str += to_string(data->imm);
             std::cout << instr_str << std::endl;
         } break;
         

@@ -25,7 +25,7 @@ void CPU::decode(State *state) {
         | ((instr >> 7) & 0x1e);
         
     // Store Imm: imm[4:0] imm[11:5]
-    data->imm_s = data->rd | ((data->func7) >> 20);
+    data->imm_s = data->rd | ((data->func7) << 5);
     
     // J-Types
     data->imm_j = ((uint32_t)(instr & 0x80000000) >> 11)
@@ -77,6 +77,7 @@ void CPU::decodeSet(Data *data) {
             data->reg_write = 1;
             data->rs1_src = 0;
             data->pc_write = 0;
+            data->imm = data->imm_i;
         } break;
         
         //
@@ -93,6 +94,7 @@ void CPU::decodeSet(Data *data) {
             data->reg_write = 1;
             data->rs1_src = 1;
             data->pc_write = 1;
+            data->imm = data->imm_i;
         } break;
         
         //
@@ -109,6 +111,7 @@ void CPU::decodeSet(Data *data) {
             data->reg_write = 0;
             data->rs1_src = 0;
             data->pc_write = 0;
+            data->imm = data->imm_b;
         } break;
         
         //
@@ -125,6 +128,7 @@ void CPU::decodeSet(Data *data) {
             data->reg_write = 1;
             data->rs1_src = 0;
             data->pc_write = 0;
+            data->imm = data->imm_i;
         } break;
         
         //
@@ -142,6 +146,7 @@ void CPU::decodeSet(Data *data) {
             data->reg_write = 0;
             data->rs1_src = 0;
             data->pc_write = 0;
+            data->imm = data->imm_s;
         } break;
         
         //
@@ -159,6 +164,7 @@ void CPU::decodeSet(Data *data) {
             data->reg_write = 1;
             data->rs1_src = 0;
             data->pc_write = 0;
+            data->imm = data->imm_u;
         } break;
         
         //
@@ -176,6 +182,7 @@ void CPU::decodeSet(Data *data) {
             data->reg_write = 1;
             data->rs1_src = 1;
             data->pc_write = 0;
+            data->imm = data->imm_u;
         } break;
         
         //
@@ -192,6 +199,7 @@ void CPU::decodeSet(Data *data) {
             data->reg_write = 1;
             data->rs1_src = 1;
             data->pc_write = 1;
+            data->imm = data->imm_j;
         } break;
         
         default: {}

@@ -33,6 +33,9 @@ struct Data {
     int rs1_src = 0;
     int pc_write = 0;
     int alu_invert = 0;
+    
+    // The final, decoded immediate
+    uint32_t imm = 0;
 };
 
 //
