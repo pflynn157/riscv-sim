@@ -37,7 +37,7 @@ void CPU::loadProgram(std::string path, int start) {
     int index = start;
     
     while (!feof(file)) {
-        uint8_t data = fgetc(file);
+        uint8_t data = (uint8_t)fgetc(file);
         memory[index] = data;
         ++index;
     }

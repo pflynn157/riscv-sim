@@ -39,8 +39,15 @@ struct Data {
 // Holds each state of the CPU
 //
 struct State {
-    uint8_t instr = 0;
+    uint32_t instr = 0;
     Data *decodeData;
+    
+    // Memory control lines
+    bool read = false;
+    bool write = false;
+    uint32_t address = 0;
+    uint32_t write_data = 0;
+    int rd = 0;
 };
 
 //
@@ -94,6 +101,7 @@ struct CPU {
     // Returns a value from the register
     //
     int getRegister(int num) {
+        if (num == 0) return 0;
         return registers[num];
     }
     

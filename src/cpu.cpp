@@ -46,25 +46,52 @@ void CPU::fetch() {
 // The execute stage
 //
 void CPU::execute(State *state) {
-    if (!state) return;
+    if (state == nullptr) return;
     print_instruction(state->decodeData);
     Data *data = state->decodeData;
     
+    State *nextState = new State;
+    storeState = nextState;
+    
     // Get the ALU inputs
-    uint32_t src1 = registers[data->rs1];
+    uint32_t src1 = getRegister(data->rs1);
     uint32_t src2 = 0;
+    
     if (data->alu_src == 0) {
-        src2 = registers[data->rs2];
+        src2 = getRegister(data->rs2);
     } else {
-        src2 = data->imm_i;
+        if (data->mem_write) {
+            //src2 = data->imm_s;
+            src2 = 2816;
+            data->aluop = 0;
+        } else {
+            src2 = data->imm_i;
+        }
     }
     
     // Execute
     uint32_t result = 0;
+    
+    // Branch mux
     if (data->branch) {
         result = executeBRU(data, src1, src2);
     } else {
         result = executeALU(data, src1, src2);
+        
+        // mem_write mux
+        if (data->mem_write) {
+            nextState->write = true;
+            nextState->address = result;
+            nextState->write_data = getRegister(data->rs2);
+        } else {
+        
+            // mem2reg mux
+            if (data->mem2reg) {
+                
+            } else {
+                setRegister(data->rd, result);
+            }
+        }
     }
 }
 
@@ -75,7 +102,7 @@ uint32_t CPU::executeALU(Data *data, uint32_t src1, uint32_t src2) {
     switch (data->aluop) {
         // Add and Sub
         case 0: {
-        
+            return src1 + src2;
         } break;
         
         // Shift left
@@ -163,6 +190,10 @@ uint32_t CPU::executeBRU(Data *data, uint32_t src1, uint32_t src2) {
 // The store stage
 //
 void CPU::store(State *state) {
-
+    if (!state) return;
+    
+    if (state->write) {
+        setMemory(state->address, state->write_data);
+    }
 }
 

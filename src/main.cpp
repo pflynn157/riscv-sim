@@ -9,45 +9,6 @@ using namespace std;
 
 #include "cpu.hpp"
 
-//
-// Handles all branching operations
-//
-void branch(Data *data, CPU *cpu) {
-    uint32_t val1 = cpu->getRegister(data->rs1);
-    uint32_t val2 = cpu->getRegister(data->rs2);
-    
-    // BEQ (000)
-    if (data->func3 == 0) {
-        if (val1 == val2) {
-            // Update PC
-        }
-    
-    // BNE (001)
-    } else if (data->func3 == 1) {
-        if (val1 != val2) {
-            // Update PC
-        }
-    
-    // BLT (100)
-    } else if (data->func3 == 4) {
-        if (val1 < val2) {
-            // Update PC
-        }
-    
-    // BGE (101)
-    } else if (data->func3 == 5) {
-        if (val1 >= val2) {
-            // Update PC
-        }
-    
-    // BLTU (110)
-    } else if (data->func3 == 6) {
-    
-    // BGEU (111)
-    } else if (data->func3 == 7) {
-    
-    }
-}
 
 void print_signals(Data *data) {
     std::cout << "Branch: " << data->branch << " | MemRead: " << data->mem_read << " | MemToRegister: " << data->mem2reg;
@@ -299,6 +260,10 @@ int main(int argc, char **argv) {
     
     // Now, run the decoder from the last stage
     cpu->run();
+    
+    // Print the registers
+    cpu->debugRegisters();
+    cpu->flushMemory(memory);
     
     /*std::vector<uint32_t> instr_memory;
     std::ifstream reader(input, std::ifstream::binary);
