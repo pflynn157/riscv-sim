@@ -61,10 +61,13 @@ void CPU::execute(State *state) {
         src2 = getRegister(data->rs2);
     } else {
         if (data->mem_write) {
-            src2 = data->imm_s;
+            src2 = data->imm;
+            data->aluop = 0;
+        } else if (data->mem_read) {
+            src2 = data->imm;
             data->aluop = 0;
         } else {
-            src2 = data->imm_i;
+            src2 = data->imm;
         }
     }
     
@@ -86,7 +89,9 @@ void CPU::execute(State *state) {
         
             // mem2reg mux
             if (data->mem2reg) {
-                
+                nextState->read = true;
+                nextState->address = result;
+                nextState->rd = data->rd;
             } else {
                 setRegister(data->rd, result);
             }
@@ -193,6 +198,16 @@ void CPU::store(State *state) {
     
     if (state->write) {
         setMemory(state->address, state->write_data);
+    }
+    
+    if (state->read) {
+        uint8_t data0 = memory[state->address];
+        uint8_t data1 = memory[state->address + 1];
+        uint8_t data2 = memory[state->address + 2];
+        uint8_t data3 = memory[state->address + 3];
+        
+        uint32_t data = (uint32_t)data3 << 24 | (uint32_t)data2 << 16 | (uint32_t)data1 << 8 | (uint32_t)data0;
+        setRegister(state->rd, data);
     }
 }
 
