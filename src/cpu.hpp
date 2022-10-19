@@ -111,6 +111,8 @@ private:
     int memory_size = 0;
     
     void decodeSet(Data *data);
+    uint32_t executeALU(Data *data, uint32_t src1, uint32_t src2);
+    uint32_t executeBRU(Data *data, uint32_t src1, uint32_t src2);
     
     State *fetchState = nullptr;
     State *decodeState = nullptr;

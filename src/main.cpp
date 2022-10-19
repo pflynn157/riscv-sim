@@ -10,59 +10,6 @@ using namespace std;
 #include "cpu.hpp"
 
 //
-// Handles all ALU operations
-//
-void alu(Data *data, CPU *cpu, bool isImmediate) {
-    uint32_t val1 = cpu->getRegister(data->rs1);
-    uint32_t val2 = 0;
-    if (isImmediate) val2 = data->imm_i;
-    else val2 = cpu->getRegister(data->rs2);
-
-    // Add and sub (sub determined by func7)
-    if (data->func3 == 0) {
-        uint32_t result = val1 + val2;
-        cpu->setRegister(data->rd, result);
-        
-    // Shift left
-    } else if (data->func3 == 1) {
-        uint32_t result = val1 >> val2;
-        cpu->setRegister(data->rd, result);
-    
-    // SLT (set less than)
-    } else if (data->func3 == 2) {
-        uint32_t result = val1 + val2;
-        cpu->setRegister(data->rd, result);
-    
-    // SLTU (set less than unsigned)
-    } else if (data->func3 == 3) {
-        uint32_t result = val1 + val2;
-        cpu->setRegister(data->rd, result);
-    
-    // XOR
-    } else if (data->func3 == 4) {
-        uint32_t result = val1 ^ val2;
-        cpu->setRegister(data->rd, result);
-    
-    // SRL/SRA (shift right logic/arithmetic)
-    // Logic vs arithmetic determined by func7
-    } else if (data->func3 == 5) {
-        uint32_t result = val1 >> val2;
-        cpu->setRegister(data->rd, result);
-    
-    // OR
-    } else if (data->func3 == 6) {
-        uint32_t result = val1 | val2;
-        cpu->setRegister(data->rd, result);
-    
-    // AND
-    } else if (data->func3 == 7) {
-        uint32_t result = val1 & val2;
-        cpu->setRegister(data->rd, result);
-    
-    }
-}
-
-//
 // Handles all branching operations
 //
 void branch(Data *data, CPU *cpu) {
@@ -99,46 +46,6 @@ void branch(Data *data, CPU *cpu) {
     // BGEU (111)
     } else if (data->func3 == 7) {
     
-    }
-}
-
-void execute(Data *data, CPU *cpu) {
-    
-    //
-    // First, determine the opcode
-    //
-    // ALU instruction, R-Type and I-Type
-    // R-Type: 0010011 | I-Type: 0110011
-    if (data->opcode == 0x13 || data->opcode == 0x33) {
-        if (data->opcode == 0x33) {
-            alu(data, cpu, false);
-        } else {
-            alu(data, cpu, true);
-        }
-    
-    // LUI (load upper immediate), AUIPC, JAL
-    // OP: 0110111
-    } else if (data->opcode == 0x37) {
-    
-    // All the branch instructions
-    // OP: 1100011
-    } else if (data->opcode == 0x63) {
-        branch(data, cpu);
-    
-    // All the load instructions
-    // LD: 0000011
-    } else if (data->opcode == 0x03) {
-    
-        
-    // All the store instructions
-    // ST: 0100011
-    } else if (data->opcode == 0x23) {
-    
-    
-    // Otherwise, invalid opcode
-    } else {
-        cout << "Error: Invalid Opcode." << std::endl;
-        return;
     }
 }
 
