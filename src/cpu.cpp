@@ -7,7 +7,7 @@ void print_instruction(Data *data);
 //
 void CPU::run() {
     // TODO: We need a better stop
-    while (pc < 10 * 4) {
+    while (pc < 50 * 4) {
         State *decodeState1 = decodeState;
         State *exeState1 = executeState;
         State *storeState1 = storeState;
@@ -121,7 +121,7 @@ uint32_t CPU::executeALU(Data *data, uint32_t src1, uint32_t src2) {
         } break;
         
         // Shift left
-        case 1: return src1 << src2;
+        case 1: return src1 >> src2;
         
         // SLT
         case 2: {
@@ -142,7 +142,7 @@ uint32_t CPU::executeALU(Data *data, uint32_t src1, uint32_t src2) {
         // Logic vs arithmetic determined by func7
         case 5: {
             // TODO: We need to make the difference, this may not be right
-            return src1 >> src2;
+            return src1 << src2;
         } break;
         
         // OR
