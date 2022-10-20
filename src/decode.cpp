@@ -23,6 +23,13 @@ void CPU::decode(State *state) {
         | ((instr & 0x80) << 4)
         | ((instr >> 20) & 0x7e0)
         | ((instr >> 7) & 0x1e);
+    //printf("SIGNEXD: %d\n", data->imm_b & 0x800);
+    if ((data->imm_b & 0x0800) != 0) {
+        //puts("EXT");
+        data->imm_b |= 0xFFFFF000;
+    }
+    //printf("IMM_B: %X | %d\n", data->imm_b, (int32_t)data->imm_b);
+    //data->imm_b = ((data->rd >> 1) << 1) | ((data->func7 & 0b0111111) << 5);
         
     // Store Imm: imm[4:0] imm[11:5]
     data->imm_s = data->rd | ((data->func7) << 5);

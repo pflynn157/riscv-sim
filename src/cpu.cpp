@@ -77,6 +77,17 @@ void CPU::execute(State *state) {
     // Branch mux
     if (data->branch) {
         result = executeBRU(data, src1, src2);
+        if (result == 1) {
+            int32_t imm = (int32_t)data->imm;
+            int32_t offset = -12;
+            if (imm < 0) offset = -12;
+            pc += data->imm + offset;
+            printf("NEW_PC: %d\n", pc);
+            decodeState = nullptr;
+            executeState = nullptr;
+            storeState = nullptr;
+        }
+        
     } else {
         result = executeALU(data, src1, src2);
         
