@@ -10,16 +10,6 @@
 void RAM::loadMemory(std::string path, int size) {
     FILE *file = fopen(path.c_str(), "rb");
     
-    /*int size = 0;
-    while (feof(file) == 0) {
-        fgetc(file);
-        ++size;
-    }*/
-    
-    std::cout << "Memory size: " << size << std::endl;
-    
-    /*rewind(file);*/
-    
     memory = new uint8_t[size+1];
     memory_size = size+1;
     int index = 0;
@@ -43,8 +33,6 @@ void RAM::loadProgram(std::string path, int start) {
         memory[index] = data;
         ++index;
     }
-
-    //pc = start;
 }
 
 //

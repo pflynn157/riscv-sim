@@ -29,13 +29,6 @@ void CPU::run() {
 // The fetch stage
 //
 void CPU::fetch() {
-    /*uint8_t *buffer = new uint8_t[4];
-    buffer[0] = memory[pc];
-    buffer[1] = memory[pc + 1];
-    buffer[2] = memory[pc + 2];
-    buffer[3] = memory[pc + 3];
-
-    uint32_t instr = (uint32_t)buffer[3] << 24 | (uint32_t)buffer[2] << 16 | (uint32_t)buffer[1] << 8 | (uint32_t)buffer[0];*/
     uint32_t instr = ram->getMemory(pc);
     
     State *state = new State;
@@ -243,13 +236,6 @@ void CPU::store(State *state) {
     }
     
     if (state->read) {
-        /*uint8_t data0 = memory[state->address];
-        uint8_t data1 = memory[state->address + 1];
-        uint8_t data2 = memory[state->address + 2];
-        uint8_t data3 = memory[state->address + 3];
-        
-        uint32_t data = (uint32_t)data3 << 24 | (uint32_t)data2 << 16 | (uint32_t)data1 << 8 | (uint32_t)data0;*/
-        
         if (state->write_float) {
             float fdata = 0;
             uint32_t data = ram->getMemory(state->address);

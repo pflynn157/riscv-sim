@@ -4,6 +4,7 @@ project(riscv-sim)
 
 set(SRC
     cpu.cpp
+    debug.cpp
     decode.cpp
     main.cpp
     memory.cpp
