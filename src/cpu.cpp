@@ -226,7 +226,6 @@ void CPU::executeFPU(State *state) {
     
     float src1 = getFloatRegister(data->rs1);
     float src2 = getFloatRegister(data->rs2);
-    
     float result = src1 + src2;
     
     setFloatRegister(data->rd, result);
