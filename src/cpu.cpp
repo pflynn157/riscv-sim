@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "cpu.hpp"
 
 void print_instruction(Data *data);
@@ -53,6 +55,11 @@ void CPU::execute(State *state) {
     State *nextState = new State;
     storeState = nextState;
     
+    if (data->fop) {
+        executeFPU(state);
+        return;
+    }
+    
     // Get the ALU inputs
     uint32_t src1 = getRegister(data->rs1);
     uint32_t src2 = 0;
@@ -95,7 +102,15 @@ void CPU::execute(State *state) {
         if (data->mem_write) {
             nextState->write = true;
             nextState->address = result;
-            nextState->write_data = getRegister(data->rs2);
+            
+            if (data->float_reg_write) {
+                float fdata = getFloatRegister(data->rs2);
+                uint32_t mem = 0;
+                memcpy(&mem, &fdata, sizeof(uint32_t));
+                nextState->write_data = mem;
+            } else {
+                nextState->write_data = getRegister(data->rs2);
+            }
         } else {
         
             // mem2reg mux
@@ -103,6 +118,7 @@ void CPU::execute(State *state) {
                 nextState->read = true;
                 nextState->address = result;
                 nextState->rd = data->rd;
+                nextState->write_float = (bool)data->float_reg_write;
             } else {
                 setRegister(data->rd, result);
             }
@@ -202,6 +218,21 @@ uint32_t CPU::executeBRU(Data *data, uint32_t src1, uint32_t src2) {
 }
 
 //
+// The FPU
+//
+void CPU::executeFPU(State *state) {
+    if (!state) return;
+    Data *data = state->decodeData;
+    
+    float src1 = getFloatRegister(data->rs1);
+    float src2 = getFloatRegister(data->rs2);
+    
+    float result = src1 + src2;
+    
+    setFloatRegister(data->rd, result);
+}
+
+//
 // The store stage
 //
 void CPU::store(State *state) {
@@ -218,7 +249,15 @@ void CPU::store(State *state) {
         uint8_t data3 = memory[state->address + 3];
         
         uint32_t data = (uint32_t)data3 << 24 | (uint32_t)data2 << 16 | (uint32_t)data1 << 8 | (uint32_t)data0;
-        setRegister(state->rd, data);
+        
+        if (state->write_float) {
+            float fdata = 0;
+            data = getMemory(state->address);
+            memcpy(&fdata, &data, sizeof(uint32_t));
+            setFloatRegister(state->rd, fdata); 
+        } else {
+            setRegister(state->rd, data);
+        }
     }
 }
 

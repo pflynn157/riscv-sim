@@ -30,6 +30,8 @@ struct Data {
     int mem_write = 0;
     int alu_src = 0;
     int reg_write = 0;
+    int float_reg_write = 0;
+    int fop = 0;
     int rs1_src = 0;
     int pc_write = 0;
     int alu_invert = 0;
@@ -48,6 +50,7 @@ struct State {
     // Memory control lines
     bool read = false;
     bool write = false;
+    bool write_float = false;
     uint32_t address = 0;
     uint32_t write_data = 0;
     int rd = 0;
@@ -58,6 +61,7 @@ struct State {
 //
 struct CPU {
     int *registers;
+    float *float_registers;
     uint8_t *memory;
     uint32_t pc = 0;
     
@@ -66,9 +70,11 @@ struct CPU {
     //
     CPU() {
         registers = new int[32];
+        float_registers = new float[32];
         
         // set x0
         registers[0] = 0;
+        float_registers[0] = 0;
     }
     
     //
@@ -82,6 +88,7 @@ struct CPU {
     void fetch();
     void decode(State *state);
     void execute(State *state);
+    void executeFPU(State *state);
     void store(State *state);
     
     //
@@ -90,6 +97,8 @@ struct CPU {
     void loadMemory(std::string path, int size);
     void loadProgram(std::string path, int start = 0);
     void setMemory(uint16_t address, uint8_t item);
+    void setMemory(uint32_t address, uint32_t item);
+    uint32_t getMemory(uint32_t address);
     void flushMemory(std::string path);
     
     //
@@ -100,6 +109,11 @@ struct CPU {
         registers[num] = value;
     }
     
+    void setFloatRegister(int num, float value) {
+        if (num == 0) return;
+        float_registers[num] = value;
+    }
+    
     //
     // Returns a value from the register
     //
@@ -108,12 +122,22 @@ struct CPU {
         return registers[num];
     }
     
+    float getFloatRegister(int num) {
+        if (num == 0) return 0.0f;
+        return float_registers[num];
+    }
+    
     //
     // Debug function for registers
     //
     void debugRegisters() {
         for (int i = 0; i<32; i++) {
             cout << "x" << i << ": " << registers[i] << " | ";
+        }
+        cout << endl;
+        std::cout << "===================================" << std::endl;
+        for (int i = 0; i<32; i++) {
+            cout << "f" << i << ": " << (float)float_registers[i] << " | ";
         }
         cout << endl;
     }

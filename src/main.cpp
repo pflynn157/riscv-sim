@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cstdint>
 #include <fstream>
+#include <cstring>
 
 using namespace std;
 
@@ -12,8 +13,11 @@ using namespace std;
 
 void print_signals(Data *data) {
     std::cout << "Branch: " << data->branch << " | MemRead: " << data->mem_read << " | MemToRegister: " << data->mem2reg;
+    std::cout << std::endl;
+    std::cout << " | Fop: " << data->fop << std::endl;
     std::cout << " | ALUop: " << data->aluop << std::endl;
     std::cout << "MemWrite: " << data->mem_write << " | ALUsrc: " << data->alu_src << " | RegWrite: " << data->reg_write;
+    std::cout << " | Float RegWrite: " << data->float_reg_write;
     std::cout << " | RS1src: " << data->rs1_src;
     std::cout << std::endl << "| ALU_Invert: " << data->alu_invert;
     std::cout << std::endl;
@@ -152,6 +156,7 @@ void print_instruction(Data *data) {
         //
         // Loads
         //
+        case 0b0000111:
         case 0b0000011: {
             std::cout << "I-Type (Load)" << std::endl;
             printf("Length Opcode: %X\n", data->func3);
@@ -235,6 +240,41 @@ void print_instruction(Data *data) {
             std::cout << instr_str << std::endl;
         } break;
         
+        //
+        // F-ALU type
+        //
+        case 0b1010011: {
+            std::cout << "FR-Type" << std::endl;
+            printf("ALU Opcode: %X\n", data->func3);
+            
+            std::cout << "Fd: " << to_string(data->rd) << " | Fs1: " << to_string(data->rs1);
+            std::cout << " | Fs2: " << to_string(data->rs2) << std::endl;
+            print_signals(data);
+            //std::cout << "Invert: " << int(data->func7 == 32) << std::endl;
+            
+            std::string instr_str = "fadd.s";
+            /*switch (data->func3) {
+                case 0: {
+                    if (data->func7 == 32) instr_str = "sub";
+                    else instr_str = "add";
+                } break;
+                case 1: instr_str = "sll"; break;
+                case 2: instr_str = "slt"; break;
+                case 3: instr_str = "sltu"; break;
+                case 4: instr_str = "xor"; break;
+                case 5: {
+                    if (data->func7 == 32) instr_str = "sra";
+                    else instr_str = "srl";
+                } break;
+                case 6: instr_str = "or"; break;
+                case 7: instr_str = "and"; break;
+                
+                default: {}
+            }*/
+            instr_str += " f" + to_string(data->rd) + ", f" + to_string(data->rs1) + ", f" + to_string(data->rs2);
+            std::cout << instr_str << std::endl;
+        } break;
+        
         default: {}
     }
     
@@ -254,7 +294,38 @@ int main(int argc, char **argv) {
     
     CPU *cpu = new CPU;
     cpu->loadMemory(memory, 4096);
-    cpu->setMemory(0x0C00, 0x04);
+    //cpu->setMemory(0x0C00, 0x04);
+    
+    // For the sake of the program, set some float memory
+    // Array A
+    uint32_t address = 0x0A00;
+    float start = 1.1f;
+    for (int i = address; i<(address + (10*4)); i+=4) {
+        uint32_t mem = 0;
+        memcpy(&mem, &start, sizeof(uint32_t));
+        cpu->setMemory(i, mem);
+        
+        start += 1.2f;
+    }
+    
+    // Array B
+    address = 0x0B00;
+    start = 2.1f;
+    for (int i = address; i<(address + (10*4)); i+=4) {
+        uint32_t mem = 0;
+        memcpy(&mem, &start, sizeof(uint32_t));
+        cpu->setMemory(i, mem);
+        
+        start += 1.0f;
+    }
+    
+    /*for (int i = address; i<(address + (10*4)); i+=4) {
+        uint32_t mem = cpu->getMemory(i);
+        float element = 0;
+        memcpy(&element, &mem, sizeof(uint32_t));
+        std::cout << "FLOAT: " << element << std::endl;
+    }*/
+    
     cpu->loadProgram(input, 0x0);
     cpu->flushMemory(memory);
     

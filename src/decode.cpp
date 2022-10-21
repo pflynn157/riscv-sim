@@ -124,6 +124,7 @@ void CPU::decodeSet(Data *data) {
         //
         // Loads
         //
+        case 0b0000111:
         case 0b0000011: {
             //print_signals(0, 1, 1, 000, 0, 1, 1, 0, 0);
             data->branch = 0;
@@ -136,12 +137,15 @@ void CPU::decodeSet(Data *data) {
             data->rs1_src = 0;
             data->pc_write = 0;
             data->imm = data->imm_i;
+            
+            if (data->opcode == 0b0000111) data->float_reg_write = 1;
         } break;
         
         //
         // Stores
         // S-Type
         //
+        case 0b0100111:
         case 0b0100011: {
             //print_signals(0, 0, 0, 000, 1, 1, 0, 0, 0);
             data->branch = 0;
@@ -154,6 +158,8 @@ void CPU::decodeSet(Data *data) {
             data->rs1_src = 0;
             data->pc_write = 0;
             data->imm = data->imm_s;
+            
+            if (data->opcode == 0b0100111) data->float_reg_write = 1;
         } break;
         
         //
@@ -207,6 +213,22 @@ void CPU::decodeSet(Data *data) {
             data->rs1_src = 1;
             data->pc_write = 1;
             data->imm = data->imm_j;
+        } break;
+        
+        //
+        // Floating-point ALU operations
+        //
+        case 0b1010011: {
+            data->branch = 0;
+            data->mem_read = 0;
+            data->mem2reg = 0;
+            data->aluop = data->func3;
+            data->mem_write = 0;
+            data->alu_src = 0;
+            data->reg_write = 1;
+            data->rs1_src = 0;
+            data->pc_write = 0;
+            data->fop = 1;
         } break;
         
         default: {}

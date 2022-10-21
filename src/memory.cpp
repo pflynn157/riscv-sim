@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstring>
 
 #include "cpu.hpp"
 
@@ -50,6 +51,22 @@ void CPU::loadProgram(std::string path, int start) {
 //
 void CPU::setMemory(uint16_t address, uint8_t item) {
     memory[address] = item;
+}
+
+//
+// Sets a 32-bit location in memory
+//
+void CPU::setMemory(uint32_t address, uint32_t item) {
+    memcpy(&memory[address], &item, sizeof(uint32_t));
+}
+
+//
+// Returns a 32-bit location in memory
+//
+uint32_t CPU::getMemory(uint32_t address) {
+    uint32_t item = 0;
+    memcpy(&item, &memory[address], sizeof(uint32_t));
+    return item;
 }
 
 //
