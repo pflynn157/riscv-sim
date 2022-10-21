@@ -1,12 +1,13 @@
 #include <cstdio>
 #include <cstring>
+#include <iostream>
 
-#include "cpu.hpp"
+#include "memory.hpp"
 
 //
 // Loads the memory
 //
-void CPU::loadMemory(std::string path, int size) {
+void RAM::loadMemory(std::string path, int size) {
     FILE *file = fopen(path.c_str(), "rb");
     
     /*int size = 0;
@@ -33,7 +34,7 @@ void CPU::loadMemory(std::string path, int size) {
 //
 // Loads a program to the memory and sets the program counter
 //
-void CPU::loadProgram(std::string path, int start) {
+void RAM::loadProgram(std::string path, int start) {
     FILE *file = fopen(path.c_str(), "rb");
     int index = start;
     
@@ -43,27 +44,27 @@ void CPU::loadProgram(std::string path, int start) {
         ++index;
     }
 
-    pc = start;
+    //pc = start;
 }
 
 //
 // Sets the contents of a particular location in memory
 //
-void CPU::setMemory(uint16_t address, uint8_t item) {
+void RAM::setMemory(uint16_t address, uint8_t item) {
     memory[address] = item;
 }
 
 //
 // Sets a 32-bit location in memory
 //
-void CPU::setMemory(uint32_t address, uint32_t item) {
+void RAM::setMemory(uint32_t address, uint32_t item) {
     memcpy(&memory[address], &item, sizeof(uint32_t));
 }
 
 //
 // Returns a 32-bit location in memory
 //
-uint32_t CPU::getMemory(uint32_t address) {
+uint32_t RAM::getMemory(uint32_t address) {
     uint32_t item = 0;
     memcpy(&item, &memory[address], sizeof(uint32_t));
     return item;
@@ -72,7 +73,7 @@ uint32_t CPU::getMemory(uint32_t address) {
 //
 // Flushes our memory file back to the disk
 //
-void CPU::flushMemory(std::string path) {
+void RAM::flushMemory(std::string path) {
     FILE *file = fopen(path.c_str(), "wb");
     
     for (int i = 0; i<memory_size; i++) {

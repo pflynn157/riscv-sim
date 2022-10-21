@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <iostream>
 
+#include "memory.hpp"
+
 using namespace std;
 
 //
@@ -62,7 +64,6 @@ struct State {
 struct CPU {
     int *registers;
     float *float_registers;
-    uint8_t *memory;
     uint32_t pc = 0;
     
     //
@@ -92,14 +93,15 @@ struct CPU {
     void store(State *state);
     
     //
-    // Memory controller functions
+    // Set and get the RAM
     //
-    void loadMemory(std::string path, int size);
-    void loadProgram(std::string path, int start = 0);
-    void setMemory(uint16_t address, uint8_t item);
-    void setMemory(uint32_t address, uint32_t item);
-    uint32_t getMemory(uint32_t address);
-    void flushMemory(std::string path);
+    void setRAM(RAM *ram) {
+        this->ram = ram;
+    }
+    
+    RAM *getRam() {
+        return ram;
+    }
     
     //
     // Sets a register
@@ -143,7 +145,7 @@ struct CPU {
     }
     
 private:
-    int memory_size = 0;
+    RAM *ram;
     
     void decodeSet(Data *data);
     uint32_t executeALU(Data *data, uint32_t src1, uint32_t src2);

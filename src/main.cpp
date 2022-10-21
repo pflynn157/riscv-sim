@@ -292,8 +292,12 @@ int main(int argc, char **argv) {
     std::string input = argv[1];
     std::string memory = argv[2];
     
+    RAM *ram = new RAM();
+    ram->loadMemory(memory, 4096);
+    
     CPU *cpu = new CPU;
-    cpu->loadMemory(memory, 4096);
+    cpu->setRAM(ram);
+    //cpu->getRam()->loadMemory(memory, 4096);
     //cpu->setMemory(0x0C00, 0x04);
     
     // For the sake of the program, set some float memory
@@ -303,7 +307,7 @@ int main(int argc, char **argv) {
     for (int i = address; i<(address + (10*4)); i+=4) {
         uint32_t mem = 0;
         memcpy(&mem, &start, sizeof(uint32_t));
-        cpu->setMemory(i, mem);
+        ram->setMemory(i, mem);
         
         start += 1.2f;
     }
@@ -314,7 +318,7 @@ int main(int argc, char **argv) {
     for (int i = address; i<(address + (10*4)); i+=4) {
         uint32_t mem = 0;
         memcpy(&mem, &start, sizeof(uint32_t));
-        cpu->setMemory(i, mem);
+        ram->setMemory(i, mem);
         
         start += 1.0f;
     }
@@ -326,15 +330,16 @@ int main(int argc, char **argv) {
         std::cout << "FLOAT: " << element << std::endl;
     }*/
     
-    cpu->loadProgram(input, 0x0);
-    cpu->flushMemory(memory);
+    ram->loadProgram(input, 0x0);
+    cpu->pc = 0;
+    ram->flushMemory(memory);
     
     // Now, run the decoder from the last stage
     cpu->run();
     
     // Print the registers
     cpu->debugRegisters();
-    cpu->flushMemory(memory);
+    ram->flushMemory(memory);
     
     /*std::vector<uint32_t> instr_memory;
     std::ifstream reader(input, std::ifstream::binary);
