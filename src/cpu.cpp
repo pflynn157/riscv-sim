@@ -117,6 +117,7 @@ void CPU::execute(State *state) {
             decodeState = nullptr;
             executeState = nullptr;
             storeState = nullptr;
+            halt = false;
         }
         
     } else {

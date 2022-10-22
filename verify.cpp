@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
         std::cout << "A: " << a[i] << " B: " << b[i] << " = C: " << c[i] << " ";
         std::cout << "(Expected: " << a[i] + b[i] << ")";
         
-        if ((a[i] + b[i]) != c[i]) std::cout << " \t\t[FAIL]";
+        if ((a[i] + b[i]) != c[i]) std::cout << " \t\t[FAIL]" << std::endl;
         else std::cout << " \t\t[PASS]" << std::endl;
     }
     
