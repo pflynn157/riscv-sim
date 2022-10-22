@@ -33,6 +33,8 @@ void RAM::loadProgram(std::string path, int start) {
         memory[index] = data;
         ++index;
     }
+    
+    memory[index] = 0xFF;
 }
 
 //

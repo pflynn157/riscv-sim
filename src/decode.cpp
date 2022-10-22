@@ -42,11 +42,24 @@ void CPU::decode(State *state) {
         
     // Sets all the control signals based on the decoded instruction
     decodeSet(data);
-        
+    
     // Create the new state
     State *newState = new State;
     newState->decodeData = data;
     executeState = newState;
+    
+    // Check to see if we need to stall
+    switch (data->opcode) {
+        case 0b0000111:             // Load
+        case 0b0000011:             // Fload load
+        case 0b0100111:             // Store
+        case 0b0100011:             // Float store
+        {
+            newState->stall = true;
+        }
+        
+        default: {}
+    }
 }
 
 void CPU::decodeSet(Data *data) {

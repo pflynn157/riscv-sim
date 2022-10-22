@@ -6,4 +6,6 @@ add_compile_options(-g)
 add_subdirectory(src)
 
 add_executable(memgen generate.cpp)
+add_executable(verify verify.cpp)
+add_executable(setup setup.cpp)
 

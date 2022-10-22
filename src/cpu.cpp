@@ -18,10 +18,35 @@ void CPU::run() {
         storeState = nullptr;
         
         // TODO: There are stalls, for now we're assuming not
-        fetch();
+        /*fetch();
         decode(decodeState1);
         execute(exeState1);
+        store(storeState1);*/
+        
+        if (exeState1 && exeState1->stall == true) {
+            pc -= 4;
+            std::cout << "STALL [PC: " << pc << "]" << std::endl;
+            decode(nullptr);
+            //exeState1 = nullptr;
+            
+            
+        // Otherwise, fetch and decode
+        } else {
+        //std::cout << "FETCH" << std::endl;
+        //std::cout << "PC: " << pc << std::endl;
+            fetch();
+            decode(decodeState1);
+        }
+        execute(exeState1);
         store(storeState1);
+        
+        ++clock_cycles;
+        
+        if (halt) {
+            if (decodeState == nullptr && executeState == nullptr && storeState == nullptr) {
+                break;
+            }
+        }
     }
 }
 
@@ -30,6 +55,11 @@ void CPU::run() {
 //
 void CPU::fetch() {
     uint32_t instr = ram->getMemory(pc);
+    
+    if (halt || instr == 0x00FFFF) {
+        halt = true;
+        return;
+    }
     
     State *state = new State;
     state->instr = instr;

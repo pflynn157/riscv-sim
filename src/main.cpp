@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     
     // For the sake of the program, set some float memory
     // Array A
-    uint32_t address = 0x0400;
+    /*uint32_t address = 0x0400;
     float start = 1.1f;
     for (int i = address; i<(address + (256*4)); i+=4) {
         uint32_t mem = 0;
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
         ram->setMemory(i, mem);
         
         start += 1.0f;
-    }
+    }*/
     
     ram->loadProgram(input, 0x0);
     cpu->pc = 0;
@@ -60,6 +60,11 @@ int main(int argc, char **argv) {
     // Print the registers
     cpu->debugRegisters();
     ram->flushMemory(memory);
+    
+    // TODO: Print CPI here
+    std::cout << "=====================================" << std::endl;
+    std::cout << "Clock Cycles: " << cpu->clock_cycles << std::endl;
+    std::cout << "=====================================" << std::endl;
     
     return 0;
 }

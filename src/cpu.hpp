@@ -48,6 +48,7 @@ struct Data {
 struct State {
     uint32_t instr = 0;
     Data *decodeData;
+    bool stall = false;
     
     // Memory control lines
     bool read = false;
@@ -65,6 +66,8 @@ struct CPU {
     int *registers;
     float *float_registers;
     uint32_t pc = 0;
+    uint32_t clock_cycles = 0;
+    bool halt = false;
     
     //
     // Sets up the CPU
