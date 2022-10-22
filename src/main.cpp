@@ -29,9 +29,9 @@ int main(int argc, char **argv) {
     
     // For the sake of the program, set some float memory
     // Array A
-    uint32_t address = 0x0A00;
+    uint32_t address = 0x0400;
     float start = 1.1f;
-    for (int i = address; i<(address + (10*4)); i+=4) {
+    for (int i = address; i<(address + (256*4)); i+=4) {
         uint32_t mem = 0;
         memcpy(&mem, &start, sizeof(uint32_t));
         ram->setMemory(i, mem);
@@ -40,9 +40,9 @@ int main(int argc, char **argv) {
     }
     
     // Array B
-    address = 0x0B00;
+    address = 0x0800;
     start = 2.1f;
-    for (int i = address; i<(address + (10*4)); i+=4) {
+    for (int i = address; i<(address + (256*4)); i+=4) {
         uint32_t mem = 0;
         memcpy(&mem, &start, sizeof(uint32_t));
         ram->setMemory(i, mem);
