@@ -11,3 +11,6 @@ set(SRC
 )
 
 add_executable(cpu ${SRC})
+
+target_link_libraries(cpu pthread)
+

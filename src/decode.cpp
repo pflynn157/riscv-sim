@@ -191,6 +191,7 @@ void CPU::decodeSet(Data *data) {
             data->rs1_src = 0;
             data->pc_write = 0;
             data->imm = data->imm_u;
+            data->addui = 1;
         } break;
         
         //

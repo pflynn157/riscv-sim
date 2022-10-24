@@ -9,7 +9,7 @@ void print_instruction(Data *data);
 //
 void CPU::run() {
     // TODO: We need a better stop
-    while (pc < 50 * 4) {
+    while (pc < (pc+ 50 * 4)) {
         State *decodeState1 = decodeState;
         State *exeState1 = executeState;
         State *storeState1 = storeState;
@@ -66,6 +66,7 @@ void CPU::fetch() {
     decodeState = state;
     
     pc += 4;
+    ++i_count;
 }
 
 //
@@ -81,6 +82,15 @@ void CPU::execute(State *state) {
     
     if (data->fop) {
         executeFPU(state);
+        return;
+    }
+    
+    // For add upper immediate
+    // TODO: May need to clean up
+    if (data->addui) {
+        uint32_t reg = getRegister(data->rd);
+        reg = data->imm_u << 12;
+        setRegister(data->rd, reg);
         return;
     }
     
@@ -158,6 +168,7 @@ uint32_t CPU::executeALU(Data *data, uint32_t src1, uint32_t src2) {
     switch (data->aluop) {
         // Add and Sub
         case 0: {
+            if (data->alu_invert) return src1 - src2;
             return src1 + src2;
         } break;
         

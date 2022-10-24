@@ -37,6 +37,7 @@ struct Data {
     int rs1_src = 0;
     int pc_write = 0;
     int alu_invert = 0;
+    int addui = 0;          // add upper immediate
     
     // The final, decoded immediate
     uint32_t imm = 0;
@@ -67,6 +68,7 @@ struct CPU {
     float *float_registers;
     uint32_t pc = 0;
     uint32_t clock_cycles = 0;
+    uint32_t i_count = 0;
     bool halt = false;
     
     //
