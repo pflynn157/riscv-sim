@@ -74,7 +74,7 @@ void CPU::fetch() {
 //
 void CPU::execute(State *state) {
     if (state == nullptr) return;
-    print_instruction(state->decodeData);
+    //print_instruction(state->decodeData);
     Data *data = state->decodeData;
     
     State *nextState = new State;
@@ -90,6 +90,7 @@ void CPU::execute(State *state) {
     if (data->addui) {
         uint32_t reg = getRegister(data->rd);
         reg = data->imm_u << 12;
+        //std::cout << "RD: " << data->rd << " = " << reg << std::endl;
         setRegister(data->rd, reg);
         return;
     }

@@ -12,6 +12,10 @@ using namespace std;
 #include "cpu.hpp"
 #include "memory.hpp"
 
+//
+// This simply sets some random values in memory
+// By this point, ram is loaded into memory
+//
 void test1(RAM *ram) {
     uint32_t count = 10;
     uint32_t index = 6;
@@ -30,6 +34,14 @@ void test1(RAM *ram) {
     }
 }
 
+//
+// This function runs the CPU
+// Right now, it connects the RAM directly to the CPU.
+// This shouldn't happen. The RAM should be connected to the bus, and the
+// bus should be connected to the CPU (so it's pretty much in between)
+//
+// See the CPU class for information on how to swap out the ram with the bus
+//
 void run0(std::string input, std::string memory, RAM *ram, int start) {
     CPU *cpu = new CPU;
     cpu->setRAM(ram);
@@ -46,21 +58,6 @@ void run0(std::string input, std::string memory, RAM *ram, int start) {
     ram->flushMemory(memory);
     std::cout << "===============================================" << std::endl;
 }
-
-/*void run1(RAM *ram) {
-    ram->loadProgram(input2, 0x100);
-    ram->flushMemory(memory);
-    
-    CPU *cpu2 = new CPU;
-    cpu2->setRAM(ram);
-    cpu2->pc = 0x100;
-    cpu2->run();
-    
-    std::cout << "==CPU1=========================================" << std::endl;
-    cpu2->debugRegisters();
-    ram->flushMemory(memory);
-    std::cout << "===============================================" << std::endl;
-}*/
 
 int main(int argc, char **argv) {
     if (argc == 1) {
@@ -84,26 +81,16 @@ int main(int argc, char **argv) {
     // Set some values in memory
     test1(ram);
     
-    
-    /*run0(input, memory, ram, 0);
-    
-    
-    
-    
-    //
-    // CPU 2
-    //
-    if (input2 != "") {
-        run0(input2, memory, ram, 0x0100);
-    }*/
-    
     // If we have multiple inputs, then thread
     if (input2 != "") {
-        std::thread t1(run0, input, memory, ram, 0);
+        // NOTE: Leave this commented out
+        /*std::thread t1(run0, input, memory, ram, 0);
         std::thread t2(run0, input2, memory, ram, 0x0100);
         
         t1.join();
-        t2.join();
+        t2.join();*/
+        run0(input, memory, ram, 0);
+        run0(input2, memory, ram, 0x0100);
     } else {
         run0(input, memory, ram, 0);
     }

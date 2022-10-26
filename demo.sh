@@ -2,7 +2,7 @@
 
 cd build
 
-./memgen 4096
+./memgen 5400
 ../rvas ../program.asm test.bin
 
 ./setup

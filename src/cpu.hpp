@@ -150,6 +150,10 @@ struct CPU {
     }
     
 private:
+    // This is currently how we set RAM- with a direct connection to memory via the RAM object
+    // Remove this and replace with the bus. Then, go through "cpu.cpp" in the writeback stage,
+    // and replace the "ram" references with "bus". The functions should be the same.
+    //
     RAM *ram;
     
     void decodeSet(Data *data);

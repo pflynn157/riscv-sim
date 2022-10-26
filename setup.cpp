@@ -7,8 +7,10 @@ int main(int argc, char **argv) {
     FILE *file;
     file = fopen("memory.bin", "rb");
     
+    size_t mem_size = 5500;
+    
     // First, read the whole thing to our memory
-    uint8_t *memory = new uint8_t[4096];
+    uint8_t *memory = new uint8_t[mem_size];
     
     uint32_t index = 0;
     while (!feof(file)) {
@@ -37,7 +39,7 @@ int main(int argc, char **argv) {
     fclose(file);
     
     file = fopen("memory.bin", "wb");
-    for (int i = 0; i<4096; i++) {
+    for (int i = 0; i<mem_size; i++) {
         fwrite(&memory[i], sizeof(uint8_t), 1, file);
     }
     fclose(file);

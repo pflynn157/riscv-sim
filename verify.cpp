@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
     file = fopen("memory.bin", "rb");
     
     // First, read the whole thing to our memory
-    uint8_t *memory = new uint8_t[4096];
+    uint8_t *memory = new uint8_t[5500];
     
     uint32_t index = 0;
     while (!feof(file)) {
