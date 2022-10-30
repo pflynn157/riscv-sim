@@ -56,12 +56,12 @@ void CPU::decode(State *state) {
         case 0b0100011:             // Float store
         {
             newState->stall = 2;
-        }
+        } break;
         
         case 0b1010011:             // Fadd.s/Fsub.s
         {
             newState->stall = 5;
-        }
+        } break;
         
         default: {}
     }

@@ -26,12 +26,14 @@ void CPU::run() {
             execute(exeState1);
             store(storeState1);
             
+            int start = clock_cycles;
             for (int i = 1; i<exeState1->stall; i++) {
                 decode(nullptr);
                 execute(nullptr);
                 store(nullptr);
                 ++clock_cycles;
             }
+            
         // Otherwise, fetch and decode
         } else {
             fetch();
