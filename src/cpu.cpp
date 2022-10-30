@@ -16,29 +16,30 @@ void CPU::run() {
         decodeState = nullptr;
         executeState = nullptr;
         storeState = nullptr;
+
         
-        // TODO: There are stalls, for now we're assuming not
-        /*fetch();
-        decode(decodeState1);
-        execute(exeState1);
-        store(storeState1);*/
-        
-        if (exeState1 && exeState1->stall == true) {
+        if (exeState1 && exeState1->stall > 0) {
             pc -= 4;
             std::cout << "STALL [PC: " << pc << "]" << std::endl;
             decode(nullptr);
-            //exeState1 = nullptr;
             
+            execute(exeState1);
+            store(storeState1);
             
+            for (int i = 1; i<exeState1->stall; i++) {
+                decode(nullptr);
+                execute(nullptr);
+                store(nullptr);
+                ++clock_cycles;
+            }
         // Otherwise, fetch and decode
         } else {
-        //std::cout << "FETCH" << std::endl;
-        //std::cout << "PC: " << pc << std::endl;
             fetch();
             decode(decodeState1);
+            execute(exeState1);
+            store(storeState1);
         }
-        execute(exeState1);
-        store(storeState1);
+        
         
         ++clock_cycles;
         
@@ -263,7 +264,10 @@ void CPU::executeFPU(State *state) {
     
     float src1 = getFloatRegister(data->rs1);
     float src2 = getFloatRegister(data->rs2);
-    float result = src1 + src2;
+    
+    float result = 0;
+    if (data->alu_invert) result = src1 - src2;
+    else result = src1 + src2;
     
     setFloatRegister(data->rd, result);
 }

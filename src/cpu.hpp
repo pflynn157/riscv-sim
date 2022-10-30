@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "memory.hpp"
+#include "bus.hpp"
 
 using namespace std;
 
@@ -49,7 +50,7 @@ struct Data {
 struct State {
     uint32_t instr = 0;
     Data *decodeData;
-    bool stall = false;
+    int stall = 0;
     
     // Memory control lines
     bool read = false;
@@ -77,6 +78,10 @@ struct CPU {
     CPU() {
         registers = new int[32];
         float_registers = new float[32];
+        for (int i = 0; i<32; i++) {
+            registers[i] = 0;
+            float_registers[i] = 0;
+        }
         
         // set x0
         registers[0] = 0;
@@ -100,12 +105,8 @@ struct CPU {
     //
     // Set and get the RAM
     //
-    void setRAM(RAM *ram) {
+    void setBus(Bus *ram) {
         this->ram = ram;
-    }
-    
-    RAM *getRam() {
-        return ram;
     }
     
     //
@@ -154,7 +155,7 @@ private:
     // Remove this and replace with the bus. Then, go through "cpu.cpp" in the writeback stage,
     // and replace the "ram" references with "bus". The functions should be the same.
     //
-    RAM *ram;
+    Bus *ram;
     
     void decodeSet(Data *data);
     uint32_t executeALU(Data *data, uint32_t src1, uint32_t src2);

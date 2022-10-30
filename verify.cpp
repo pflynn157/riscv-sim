@@ -20,12 +20,14 @@ int main(int argc, char **argv) {
     uint32_t array_a = 0x0400;
     uint32_t array_b = 0x0800;
     uint32_t array_c = 0x0C00;
+    uint32_t array_d = 0x1000;
     uint32_t size = 256;
     
     // Create the arrays
     float *a = new float[size];
     float *b = new float[size];
     float *c = new float[size];
+    float *d = new float[size];
     
     // Load each array
     index = 0;
@@ -52,13 +54,25 @@ int main(int argc, char **argv) {
         ++index;
     }
     
+    index = 0;
+    for (uint32_t i = array_d; i<(array_d + size * 4); i+=4) {
+        float num = 0;
+        memcpy(&num, &memory[i], sizeof(uint32_t));
+        d[index] = num;
+        ++index;
+    }
+    
     // Now, verify
     for (int i = 0; i<size; i++) {
         std::cout << "A: " << a[i] << " B: " << b[i] << " = C: " << c[i] << " ";
         std::cout << "(Expected: " << a[i] + b[i] << ")";
+        std::cout << " \t| A-B= D: " << d[i] << " (Expected: " << a[i] - b[i] << ")";
         
-        if ((a[i] + b[i]) != c[i]) std::cout << " \t\t[FAIL]" << std::endl;
-        else std::cout << " \t\t[PASS]" << std::endl;
+        if ((a[i] + b[i]) != c[i]) std::cout << " \t\t[FAIL]";
+        else std::cout << " \t\t[PASS]";
+        std::cout << " || ";
+        if ((a[i] - b[i]) != d[i]) std::cout << " [FAIL]" << std::endl;
+        else std::cout << " [PASS]" << std::endl;
     }
     
     // Cleanup and close

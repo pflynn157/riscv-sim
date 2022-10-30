@@ -55,7 +55,12 @@ void CPU::decode(State *state) {
         case 0b0100111:             // Store
         case 0b0100011:             // Float store
         {
-            newState->stall = true;
+            newState->stall = 2;
+        }
+        
+        case 0b1010011:             // Fadd.s/Fsub.s
+        {
+            newState->stall = 5;
         }
         
         default: {}
@@ -243,6 +248,8 @@ void CPU::decodeSet(Data *data) {
             data->rs1_src = 0;
             data->pc_write = 0;
             data->fop = 1;
+            
+            if (data->func7 == 4) data->alu_invert = 1;
         } break;
         
         default: {}

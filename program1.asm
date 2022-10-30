@@ -7,7 +7,7 @@ sw x6, 4(x2)
 add x6, x0, x0
 
 ; 256
-addi x7, x0, 10
+addi x7, x0, 256
 
 loop_cmp:
     lw x25, 4(x2)
@@ -20,14 +20,14 @@ loop:
     add x0, x0, x0
     srli x20, x6, 2
     
-    lw x4, 1024(x20)
-    lw x5, 2048(x20)
+    flw f4, 1024(x20)
+    flw f5, 2048(x20)
     add x0, x0, x0
     add x0, x0, x0
 
-    add x6, x4, x5
+    fadd.s f6, f4, f5
 
-    sw x6, 3072(x20)
+    fsw f6, 3072(x20)
     
     lw x21, 4(x2)
     add x0, x0, x0

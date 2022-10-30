@@ -1,13 +1,14 @@
 #!/bin/bash
 
-cd build
+#cd build
 
-./memgen 5400
-../rvas ../program.asm test.bin
+./memgen 5500
+../rvas ../program1.asm test1.bin
+../rvas ../program2.asm test2.bin
 
 ./setup
 
-src/cpu test.bin memory.bin
+src/cpu test1.bin test2.bin memory.bin
 
 ./verify
 

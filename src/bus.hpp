@@ -16,5 +16,8 @@ public:
     uint32_t getMemory(uint32_t address);
 private:
     RAM *ram;
+    uint32_t readAddress = -1;
+    uint32_t writeAddress = -1;
+     
 };
 

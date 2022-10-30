@@ -11,26 +11,26 @@ using namespace std;
 
 #include "cpu.hpp"
 #include "memory.hpp"
+#include "bus.hpp"
 
 //
 // This simply sets some random values in memory
 // By this point, ram is loaded into memory
 //
 void test1(RAM *ram) {
+    srand(time(NULL));
     uint32_t count = 10;
-    uint32_t index = 6;
 
     uint32_t address1 = 0x0400;
     for (int i = address1; i<(address1 + count * 4); i+=4) {
-        ram->setMemory(i, index);
-        ++index;
+        uint32_t num = 10 + (rand() % 11);
+        ram->setMemory(i, num);
     }
     
     uint32_t address2 = 0x0800;
-    index = 1;
     for (int i = address2; i<(address2 + count * 4); i+=4) {
-        ram->setMemory(i, index);
-        ++index;
+        uint32_t num = rand() % 11;
+        ram->setMemory(i, num);
     }
 }
 
@@ -42,9 +42,8 @@ void test1(RAM *ram) {
 //
 // See the CPU class for information on how to swap out the ram with the bus
 //
-void run0(std::string input, std::string memory, RAM *ram, int start) {
-    CPU *cpu = new CPU;
-    cpu->setRAM(ram);
+void run0(std::string input, std::string memory, CPU *cpu, RAM *ram, Bus *bus, int start) {
+    cpu->setBus(bus);
     
     ram->loadProgram(input, start);
     cpu->pc = start;
@@ -76,31 +75,48 @@ int main(int argc, char **argv) {
     }
     
     RAM *ram = new RAM();
-    ram->loadMemory(memory, 5400);
+    ram->loadMemory(memory, 5500);
     
+    Bus *bus = new Bus(ram);
+
     // Set some values in memory
-    test1(ram);
+    //test1(ram);
     
     // If we have multiple inputs, then thread
+    int clock_cycles = 0;
+    int i_count = 0;
+    
     if (input2 != "") {
         // NOTE: Leave this commented out
-        /*std::thread t1(run0, input, memory, ram, 0);
-        std::thread t2(run0, input2, memory, ram, 0x0100);
+        CPU *cpu0 = new CPU;
+        CPU *cpu1 = new CPU;
+        
+        std::thread t1(run0, input, memory, cpu0, ram, bus, 0);
+        std::thread t2(run0, input2, memory, cpu1, ram, bus, 0x0100);
         
         t1.join();
-        t2.join();*/
-        run0(input, memory, ram, 0);
-        run0(input2, memory, ram, 0x0100);
+        t2.join();
+        //run0(input, memory, ram, bus, 0);
+        //run0(input2, memory, ram, bus, 0x0100);
+        clock_cycles += cpu0->clock_cycles;
+        i_count += cpu0->i_count;
+        
+        clock_cycles += cpu1->clock_cycles;
+        i_count += cpu1->i_count;
     } else {
-        run0(input, memory, ram, 0);
+        CPU *cpu = new CPU;
+        run0(input, memory, cpu, ram, bus, 0);
+        
+        clock_cycles = cpu->clock_cycles;
+        i_count = cpu->i_count;
     }
     
     // TODO: Print CPI here
-    /*std::cout << "=====================================" << std::endl;
-    std::cout << "Clock Cycles: " << cpu->clock_cycles << std::endl;
-    std::cout << "Instruction Count: " << cpu->i_count << std::endl;
-    std::cout << "CPI = Clock Cycles / Instruction Count = " << (float)cpu->clock_cycles / cpu->i_count << std::endl;
-    std::cout << "=====================================" << std::endl;*/
+    std::cout << "=====================================" << std::endl;
+    std::cout << "Clock Cycles: " << clock_cycles << std::endl;
+    std::cout << "Instruction Count: " << i_count << std::endl;
+    std::cout << "CPI = Clock Cycles / Instruction Count = " << (float)clock_cycles / i_count << std::endl;
+    std::cout << "=====================================" << std::endl;
     
     return 0;
 }
