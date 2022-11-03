@@ -14,6 +14,8 @@ public:
     void setMemory(uint16_t address, uint8_t item);
     void setMemory(uint32_t address, uint32_t item);
     uint32_t getMemory(uint32_t address);
+    
+    int stalls = 0;
 private:
     RAM *ram;
     uint32_t readAddress = -1;

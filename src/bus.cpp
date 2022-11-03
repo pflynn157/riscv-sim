@@ -40,7 +40,7 @@
 // GetMemory will work the same way
 //
 void Bus::setMemory(uint16_t address, uint8_t item) {
-    while(readAddress == address);
+    while(readAddress == address) { stalls += 1; }
 
     readAddress = address;
     ram->setMemory(address, item);
@@ -50,7 +50,7 @@ void Bus::setMemory(uint16_t address, uint8_t item) {
 }
 
 void Bus::setMemory(uint32_t address, uint32_t item) {
-    while(readAddress == address);
+    while(readAddress == address) { stalls += 1; }
 
     readAddress = address;
     ram->setMemory(address, item);
@@ -60,7 +60,7 @@ void Bus::setMemory(uint32_t address, uint32_t item) {
 }
 
 uint32_t Bus::getMemory(uint32_t address) {
-    while(writeAddress == address);
+    while(writeAddress == address) { stalls += 1; }
 
     writeAddress = address;
     uint32_t data = ram->getMemory(address);

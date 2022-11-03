@@ -71,6 +71,7 @@ struct CPU {
     uint32_t clock_cycles = 0;
     uint32_t i_count = 0;
     bool halt = false;
+    std::string name = "";
     
     //
     // Sets up the CPU

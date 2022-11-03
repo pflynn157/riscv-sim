@@ -91,6 +91,9 @@ int main(int argc, char **argv) {
         CPU *cpu0 = new CPU;
         CPU *cpu1 = new CPU;
         
+        cpu0->name = "CPU0";
+        cpu1->name = "CPU1";
+        
         std::thread t1(run0, input, memory, cpu0, ram, bus, 0);
         std::thread t2(run0, input2, memory, cpu1, ram, bus, 0x0100);
         

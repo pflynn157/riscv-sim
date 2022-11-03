@@ -10,6 +10,10 @@ void print_instruction(Data *data);
 void CPU::run() {
     // TODO: We need a better stop
     while (pc < (pc+ 50 * 4)) {
+        std::cout << "--------------------------------" << std::endl;
+        std::cout << name << " [CLOCK]: " << clock_cycles << std::endl;
+        std::cout << "--------------------------------" << std::endl;
+    
         State *decodeState1 = decodeState;
         State *exeState1 = executeState;
         State *storeState1 = storeState;
@@ -77,7 +81,7 @@ void CPU::fetch() {
 //
 void CPU::execute(State *state) {
     if (state == nullptr) return;
-    //print_instruction(state->decodeData);
+    print_instruction(state->decodeData);
     Data *data = state->decodeData;
     
     State *nextState = new State;
