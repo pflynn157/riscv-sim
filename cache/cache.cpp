@@ -8,7 +8,7 @@
 // Number of blocks: 8
 
 // Block count = 256 / 32
-DirectCache::DirectCache(int size, int line_size, int assoc) {
+Cache::Cache(int size, int line_size, int assoc) {
     int offset = std::log2(line_size);
     int line_count = size / line_size;
     int sets = line_count / assoc;
@@ -39,7 +39,7 @@ DirectCache::DirectCache(int size, int line_size, int assoc) {
     }
 }
 
-bool DirectCache::containsAddress(uint32_t address) {
+bool Cache::containsAddress(uint32_t address) {
     
     // Generate the masks
     int offset_mask = 0;
@@ -76,7 +76,7 @@ bool DirectCache::containsAddress(uint32_t address) {
 //
 // Returns true if hit, returns false if miss
 //
-bool DirectCache::setData(uint32_t address, uint8_t data) {
+bool Cache::setData(uint32_t address, uint8_t data) {
     if (containsAddress(address)) {
         // TODO: Data would be set
         return true;
