@@ -2,7 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include <math.h>
+#include <cmath>
 
 #include "cache.hpp"
 
@@ -12,9 +12,8 @@ int main(int argc, char **argv) {
     int misses = 0;
     
     int size = 256;
-    int line_size = 64;
-    int assoc = 1;
-    int lookUpT = ceil(log2(size/line_size))*assoc;
+    int line_size = 1;
+    int lookUpT = ceil(log2(size/line_size));
     int accessT = 0;
     
     // tmp
@@ -27,6 +26,7 @@ int main(int argc, char **argv) {
     std::ifstream reader("addresses.txt");
     if (reader.is_open()) {
         std::string line = "";
+        int index = 0;
         while (std::getline(reader, line)) {
             std::istringstream conv(line);
             uint32_t value = 0;
@@ -36,16 +36,17 @@ int main(int argc, char **argv) {
     }
     
     // Create the cache and test
-    Cache *cache1 = new Cache(size, line_size);
+    FACache *cache1 = new FACache(size, line_size);
     for (int i = 0; i<addresses.size(); i++) {
         if (cache1->setData(addresses.at(i), 1)) {
             ++hits;
-            accessT += 2;
         } else {
             ++misses;
         }
     }
     
+    //std::cout << "Hits: " << hits << std::endl;
+    //std::cout << "Misses: " << misses << std::endl;
     double hitRate = (double)hits/((double)hits+(double)misses)*100;
     double missRate = (double)misses/((double)hits+(double)misses)*100;
     int cost = misses*(100+lookUpT);

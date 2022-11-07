@@ -23,3 +23,17 @@ private:
     int set_width = 0;
 };
 
+//
+// Fully associative cache
+//
+class FACache {
+public:
+    explicit FACache(int size, int line_size);
+    bool containsAddress(uint32_t address);
+    bool setData(uint32_t address, uint8_t data);
+private:
+    CacheEntry **cache;
+    int blocks = 0;
+    int time = 1;
+};
+

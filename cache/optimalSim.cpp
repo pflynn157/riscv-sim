@@ -11,6 +11,7 @@ int main(int argc, char **argv) {
     int hits = 0;
     int misses = 0;
     
+    //stil working on to find the optimal setup
     int size = 256;
     int line_size = 64;
     int assoc = 1;
@@ -36,8 +37,9 @@ int main(int argc, char **argv) {
     }
     
     // Create the cache and test
-    Cache *cache1 = new Cache(size, line_size);
+    Cache *cache1 = new Cache(size, line_size, assoc);
     for (int i = 0; i<addresses.size(); i++) {
+    
         if (cache1->setData(addresses.at(i), 1)) {
             ++hits;
             accessT += 2;

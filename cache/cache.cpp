@@ -15,11 +15,14 @@ Cache::Cache(int size, int line_size, int assoc) {
     int set_addr_width = log2(sets);
     int tag_width = 32 - set_addr_width - offset;
     
+    int lookUpT = ceil(log2(size/line_size))*assoc;
+    
     std::cout << "Offset: " << offset << std::endl;
     std::cout << "Line Count: " << line_count << std::endl;
     std::cout << "Sets: " << sets << std::endl;
     std::cout << "Set Addr Width: " << set_addr_width << std::endl;
     std::cout << "Tag Width: " << tag_width << std::endl;
+    std::cout << "Look Up Time: " << lookUpT << std::endl;
     std::cout << "---------------------------------" << std::endl;
     
     this->tag_width = tag_width;
@@ -102,6 +105,80 @@ bool Cache::setData(uint32_t address, uint8_t data) {
     entry->valid = true;
     entry->tag = tag;
     cache[block] = entry;
+    
+    return false;
+}
+
+//
+// Fully associative cache
+//
+FACache::FACache(int size, int line_size) {
+    blocks = size / line_size;
+    int lookUpT = ceil(log2(size/line_size))*1;
+    
+    std::cout << "Sets: " << blocks << std::endl;
+    std::cout << "Look Up Time: " << lookUpT << std::endl;
+    std::cout << "---------------------------------" << std::endl;
+    
+    cache = new CacheEntry*[blocks];
+    for (int i = 0; i<blocks; i++) {
+        CacheEntry *entry = new CacheEntry;
+        entry->data = new uint8_t[32];
+        entry->valid = false;
+        entry->time = time;
+        entry->tag = 0;
+        cache[i] = entry;
+    }
+}
+
+bool FACache::containsAddress(uint32_t address) {
+    ++time;
+
+    for (int i = 0; i<blocks; i++) {
+        CacheEntry *entry = cache[i];
+        if (entry->tag == address) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool FACache::setData(uint32_t address, uint8_t data) {
+    ++time;
+    if (containsAddress(address)) {
+        return true;
+    }
+    ++time;
+    
+    // Otherwise, find the one with the lowest time and replace with that
+    // Or find one with a "valid" == false
+    int lowestTime = 0;
+    bool found = false;
+    
+    for (int i = 1; i<blocks; i++) {
+        CacheEntry *entry = cache[i];
+        if (entry->time < cache[lowestTime]->time) {
+            lowestTime = i;
+        }
+        
+        if (entry->valid == false) {
+            entry->tag = address;
+            entry->time = time;
+            entry->valid = true;
+            found = true;
+            break;
+        }
+    }
+    
+    if (!found) {
+        delete cache[lowestTime];
+        CacheEntry *entry = new CacheEntry;
+        entry->tag = address;
+        entry->time = time;
+        entry->valid = true;
+        cache[lowestTime] = entry;
+    }
     
     return false;
 }
