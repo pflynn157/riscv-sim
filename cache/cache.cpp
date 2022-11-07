@@ -61,6 +61,8 @@ bool Cache::containsAddress(uint32_t address) {
     //printf("Address: %x | Tag Width: %x | Set Width: %x | Offset Width: %x\n", address, tag_width, set_width, offset_width);
     //printf("Tag: %x | Set: %x | Offset: %x\n\n", tag, set, offset);
     
+    ticks += 2;
+    
     CacheEntry *entry = cache[block];
     if (entry == nullptr) return false;
     if (entry->valid == false) return false;
@@ -106,6 +108,8 @@ bool Cache::setData(uint32_t address, uint8_t data) {
     entry->tag = tag;
     cache[block] = entry;
     
+    ticks += 2;
+    
     return false;
 }
 
@@ -132,9 +136,10 @@ FACache::FACache(int size, int line_size) {
 }
 
 bool FACache::containsAddress(uint32_t address) {
-    ++time;
+   
 
     for (int i = 0; i<blocks; i++) {
+     time += 3;
         CacheEntry *entry = cache[i];
         if (entry->tag == address) {
             return true;

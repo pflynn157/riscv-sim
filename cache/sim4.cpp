@@ -55,6 +55,7 @@ int main(int argc, char **argv) {
     std::cout << "Miss Rate = " << missRate << "%" << std::endl;
     std::cout << "Cost: " << cost << std::endl;
     std::cout << "Access Time: " << accessT + cost << std::endl;
+    std::cout << "Ticks: " << cache1->ticks << std::endl;
 
     return 0;
 }
