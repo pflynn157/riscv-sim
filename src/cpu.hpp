@@ -70,6 +70,7 @@ struct CPU {
     float *float_registers;
     uint32_t pc = 0;
     uint32_t clock_cycles = 0;
+    int ticks = 0;
     uint32_t i_count = 0;
     bool halt = false;
     std::string name = "";
@@ -92,6 +93,9 @@ struct CPU {
         // Create the caches
         icache = new Cache(512, 32);
         dcache = new Cache(256, 32);
+        
+        icache->lookup_time = 3;
+        dcache->lookup_time = 4;
     }
     
     //
@@ -156,6 +160,15 @@ struct CPU {
             cout << "f" << i << ": " << (float)float_registers[i] << " | ";
         }
         cout << endl;
+    }
+    
+    //
+    // Return simulation ticks
+    //
+    int getTicks() {
+        ticks += icache->ticks;
+        ticks += dcache->ticks;
+        return ticks;
     }
     
 private:

@@ -85,6 +85,7 @@ int main(int argc, char **argv) {
     // If we have multiple inputs, then thread
     int clock_cycles = 0;
     int i_count = 0;
+    int ticks = 0;
     
     if (input2 != "") {
         // NOTE: Leave this commented out
@@ -103,20 +104,24 @@ int main(int argc, char **argv) {
         //run0(input2, memory, ram, bus, 0x0100);
         clock_cycles += cpu0->clock_cycles;
         i_count += cpu0->i_count;
+        ticks += cpu0->getTicks();
         
         clock_cycles += cpu1->clock_cycles;
         i_count += cpu1->i_count;
+        ticks += cpu1->getTicks();
     } else {
         CPU *cpu = new CPU;
         run0(input, memory, cpu, ram, bus, 0);
         
         clock_cycles = cpu->clock_cycles;
         i_count = cpu->i_count;
+        ticks += cpu->getTicks();
     }
     
     // TODO: Print CPI here
     std::cout << "=====================================" << std::endl;
     std::cout << "Clock Cycles: " << clock_cycles << std::endl;
+    std::cout << "Simulation Ticks: " << ticks << std::endl;
     std::cout << "Instruction Count: " << i_count << std::endl;
     std::cout << "CPI = Clock Cycles / Instruction Count = " << (float)clock_cycles / i_count << std::endl;
     std::cout << "=====================================" << std::endl;

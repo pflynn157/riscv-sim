@@ -19,6 +19,7 @@ public:
     uint32_t getData(int clock_cycle, uint32_t address, int size);
     bool setData(int clock_cycle, uint32_t address, uint32_t data, int size);
     
+    int lookup_time = 0;
     int ticks = 0;
 private:
     CacheEntry **cache;

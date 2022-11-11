@@ -61,9 +61,12 @@ void CPU::decode(State *state) {
         case 0b1010011:             // Fadd.s/Fsub.s
         {
             newState->stall = 5;
+            ticks += 50;
         } break;
         
-        default: {}
+        default: {
+            ticks += 10;
+        }
     }
 }
 

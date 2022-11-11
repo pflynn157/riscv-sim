@@ -77,10 +77,12 @@ uint32_t Cache::getData(int clock_cycle, uint32_t address, int size) {
     // Check the cache
     CacheEntry *entry = cache[block];
     entry->time = clock_cycle;
+    ticks += lookup_time;
     
     // Item in cache
     if (entry->valid && entry->tag == tag) {
         puts("[GET] Hit");
+        
         uint32_t data = 0;
         memcpy(&data, &entry->data[offset], sizeof(uint8_t)*size);
         return data;
@@ -88,6 +90,7 @@ uint32_t Cache::getData(int clock_cycle, uint32_t address, int size) {
     // Item not in cache
     } else {
         puts("[GET] Miss");
+        ticks += 100;
         
         // Get data from RAM
         uint32_t data = bus->getMemory(address);
@@ -130,6 +133,7 @@ bool Cache::setData(int clock_cycle, uint32_t address, uint32_t data, int size) 
     // Check the cache
     CacheEntry *entry = cache[block];
     entry->time = clock_cycle;
+    ticks += lookup_time;
     
     // Item in cache
     if (entry->valid && entry->tag == tag) {
@@ -139,6 +143,8 @@ bool Cache::setData(int clock_cycle, uint32_t address, uint32_t data, int size) 
     // Item not in cache
     } else {
         puts("[SET] Miss");
+        ticks += 100;
+        
         entry->valid = true;
         entry->tag = tag;
         memcpy(&entry->data[offset], &data, sizeof(uint8_t)*size);
