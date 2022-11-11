@@ -166,6 +166,7 @@ struct CPU {
     // Return simulation ticks
     //
     int getTicks() {
+        printf("I-Cache Ticks: %d | D-Cache Ticks: %d\n", icache->ticks, dcache->ticks);
         ticks += icache->ticks;
         ticks += dcache->ticks;
         return ticks;
