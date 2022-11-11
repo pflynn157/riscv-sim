@@ -5,6 +5,7 @@
 
 #include "memory.hpp"
 #include "bus.hpp"
+#include "cache.hpp"
 
 using namespace std;
 
@@ -87,6 +88,10 @@ struct CPU {
         // set x0
         registers[0] = 0;
         float_registers[0] = 0;
+        
+        // Create the caches
+        icache = new Cache(512, 32);
+        dcache = new Cache(256, 32);
     }
     
     //
@@ -108,6 +113,8 @@ struct CPU {
     //
     void setBus(Bus *ram) {
         this->ram = ram;
+        icache->setBus(ram);
+        dcache->setBus(ram);
     }
     
     //
@@ -157,6 +164,7 @@ private:
     // and replace the "ram" references with "bus". The functions should be the same.
     //
     Bus *ram;
+    Cache *icache, *dcache;
     
     void decodeSet(Data *data);
     uint32_t executeALU(Data *data, uint32_t src1, uint32_t src2);

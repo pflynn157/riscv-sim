@@ -61,7 +61,8 @@ void CPU::run() {
 // The fetch stage
 //
 void CPU::fetch() {
-    uint32_t instr = ram->getMemory(pc);
+    //uint32_t instr = ram->getMemory(pc);
+    uint32_t instr = icache->getData(clock_cycles, pc, 4);
     
     if (halt || instr == 0x00FFFF) {
         halt = true;
@@ -285,17 +286,19 @@ void CPU::store(State *state) {
     if (!state) return;
     
     if (state->write) {
-        ram->setMemory(state->address, state->write_data);
+        //ram->setMemory(state->address, state->write_data);
+        dcache->setData(clock_cycles, state->address, state->write_data, 4);
     }
     
     if (state->read) {
+        uint32_t data = dcache->getData(clock_cycles, state->address, 4);
         if (state->write_float) {
             float fdata = 0;
-            uint32_t data = ram->getMemory(state->address);
+            //uint32_t data = ram->getMemory(state->address);
             memcpy(&fdata, &data, sizeof(uint32_t));
             setFloatRegister(state->rd, fdata); 
         } else {
-            uint32_t data = ram->getMemory(state->address);
+            //uint32_t data = ram->getMemory(state->address);
             setRegister(state->rd, data);
         }
     }
