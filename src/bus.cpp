@@ -1,5 +1,37 @@
+#include <ctime>
+#include <cstdlib>
+
 #include "bus.hpp"
 #include "memory.hpp"
+
+//
+// The constructor
+//
+Bus::Bus(RAM *ram) {
+    srand(time(NULL));
+    this->ram = ram;
+}
+
+//
+// Adds the cache to the cluster
+//
+void Bus::addCache(Cache *cache) {
+    while (true) {
+        cache->id = rand() % 1001;
+        
+        bool found = false;
+        for (Cache *c : cache_cluster) {
+            if (c->id == cache->id) {
+                found = true;
+                break;
+            }
+        }
+        
+        if (!found) break;
+    }
+    
+    cache_cluster.push_back(cache);
+}
 
 //
 // General notes:

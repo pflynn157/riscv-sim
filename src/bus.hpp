@@ -1,12 +1,17 @@
 #pragma once
 
+#include <vector>
+
 #include "memory.hpp"
+#include "cache.hpp"
+
+class Cache;
 
 class Bus {
 public:
-    explicit Bus(RAM *ram) {
-        this->ram = ram;
-    }
+    explicit Bus(RAM *ram);
+    
+    void addCache(Cache *cache);
     
     //
     // These are exactly the same on purpose
@@ -18,8 +23,9 @@ public:
     int stalls = 0;
 private:
     RAM *ram;
+    std::vector<Cache *> cache_cluster;
+    
     uint32_t readAddress = -1;
     uint32_t writeAddress = -1;
-     
 };
 

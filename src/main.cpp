@@ -95,13 +95,13 @@ int main(int argc, char **argv) {
         cpu0->name = "CPU0";
         cpu1->name = "CPU1";
         
-        std::thread t1(run0, input, memory, cpu0, ram, bus, 0);
-        std::thread t2(run0, input2, memory, cpu1, ram, bus, 0x0100);
-        
-        t1.join();
-        t2.join();
-        //run0(input, memory, ram, bus, 0);
-        //run0(input2, memory, ram, bus, 0x0100);
+        //std::thread t1(run0, input, memory, cpu0, ram, bus, 0);
+        //std::thread t2(run0, input2, memory, cpu1, ram, bus, 0x0100);
+        //
+        //t1.join();
+        //t2.join();
+        run0(input, memory, cpu0, ram, bus, 0);
+        run0(input2, memory, cpu1, ram, bus, 0x0100);
         clock_cycles += cpu0->clock_cycles;
         i_count += cpu0->i_count;
         ticks += cpu0->getTicks();

@@ -39,6 +39,13 @@ Cache::Cache(int size, int line_size, int assoc) {
     }
 }
 
+void Cache::setBus(Bus *bus) {
+    this->bus = bus;
+    
+    // Adds the cache to the cache cluster on the bus
+    bus->addCache(this);
+}
+
 void Cache::print() {
     for (int i = 0; i<blocks; i++) {
         CacheEntry *entry = cache[i];
