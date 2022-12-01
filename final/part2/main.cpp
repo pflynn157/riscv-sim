@@ -9,6 +9,10 @@ int main(int argc, char **argv) {
     Cache *c2 = new Cache(256, 32);
     Cache *c3 = new Cache(256, 32);
     Cache *c4 = new Cache(256, 32);
+    c1->setDirectory(dir);
+    c2->setDirectory(dir);
+    c3->setDirectory(dir);
+    c4->setDirectory(dir);
     c1->id = 1;
     c2->id = 2;
     c3->id = 3;
@@ -57,10 +61,10 @@ int main(int argc, char **argv) {
     c2->print();
     std::cout << std::endl;
     std::cout << "=C3=========================" << std::endl;
-    c3->print();
+    //c3->print();
     std::cout << std::endl;
     std::cout << "=C4=========================" << std::endl;
-    c4->print();
+    //c4->print();
     std::cout << std::endl;
     std::cout << "----------------------------" << std::endl;
     dir->print();

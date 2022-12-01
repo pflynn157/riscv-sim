@@ -3,6 +3,10 @@
 #include <cstdint>
 #include <vector>
 
+#include "directory.hpp"
+
+class Directory;
+
 //
 // TODO: Not sure if we need this yet, but whatever
 //
@@ -23,7 +27,7 @@ struct CacheEntry {
 class Cache {
 public:
     explicit Cache(int size, int line_size, int assoc = 1);
-    //void setBus(Bus *bus);
+    void setDirectory(Directory *dir);
     void print();
     bool hasAddress(uint32_t address);
     void invalidate(uint32_t address);
@@ -34,7 +38,7 @@ public:
     int id = 0;
 private:
     CacheEntry **cache;
-    //Bus *bus;
+    Directory *dir;
     int blocks = 0;
     int line_size = 0;
     

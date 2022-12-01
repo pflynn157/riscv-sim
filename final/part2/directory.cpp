@@ -65,3 +65,31 @@ void Directory::print() {
     }
 }
 
+void Directory::setLine(uint32_t address, uint8_t pos) {
+    // Generate the masks
+    int offset_mask = 0;
+    for (int i = 0; i<offset_width; i++) offset_mask |= (1 << i);
+    
+    int set_mask = 0;
+    for (int i = 0; i<set_width; i++) set_mask |= (1 << i);
+    
+    int tag_mask = 0;
+    for (int i = 0; i<tag_width; i++) tag_mask |= (1 << i);
+    
+    int offset = (address) & offset_mask;
+    int block = (address >> offset_width) & set_mask;
+    int tag = (address >> (set_width + offset_width)) & tag_mask;
+    
+    // Check the cache
+    DirEntry *entry = directory[block];
+    
+    // Update directory
+    // TODO
+    if (entry->tag == tag) {
+    
+    // Doesn't exist in directory
+    } else {
+        entry->tag = tag;
+    }
+}
+

@@ -38,12 +38,9 @@ Cache::Cache(int size, int line_size, int assoc) {
     }
 }
 
-//void Cache::setBus(Bus *bus) {
-//    this->bus = bus;
-//    
-//    // Adds the cache to the cache cluster on the bus
-//    bus->addCache(this);
-//}
+void Cache::setDirectory(Directory *dir) {
+    this->dir = dir;
+}
 
 void Cache::print() {
     printf("ID: %d\n", id);
@@ -172,7 +169,7 @@ uint32_t Cache::getData(uint32_t address, int size) {
             memcpy(&entry->data[i], &data2, sizeof(uint32_t));
         }
         
-        // Check the cache cluster
+        // Check the directory
         // TODO: int pos = bus->checkCacheCluster(address, id);
         int pos = -1;
         if (pos == -1) {

@@ -19,6 +19,7 @@ class Directory {
 public:
     explicit Directory(int size, int line_size, int assoc = 1);
     void print();
+    void setLine(uint32_t address, uint8_t pos);
 private:
     DirEntry **directory;
     int blocks = 0;
