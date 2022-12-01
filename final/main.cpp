@@ -9,18 +9,51 @@ int main(int argc, char **argv) {
     Cache *c2 = new Cache(256, 32);
     Cache *c3 = new Cache(256, 32);
     Cache *c4 = new Cache(256, 32);
+    c1->id = 1;
+    c2->id = 2;
+    c3->id = 3;
+    c4->id = 4;
     c1->setBus(bus);
     c2->setBus(bus);
     c3->setBus(bus);
     c4->setBus(bus);
     std::cout << "=======================================" << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
     
     // Test 1
     // Read: Read -> Invalid -> Exclusive
     // Host: Cache 1
+    c1->getData(0x804, 4);
+    c3->getData(0x964, 4);
     
+    // Read: Read -> Invalid -> Shared
+    c2->getData(0x804, 4);
+    c3->getData(0x804, 4);
+    
+    puts("");
+    
+    //
+    // Write -> Invalid -> Modified
+    c1->setData(0x932, 10, 4);
+    
+    // Write -> Invalid -> Modified
+    c2->setData(0x932, 12, 4);
+    
+    // Write -> Exclusive -> Modified
+    c3->setData(0x964, 10, 4);
+    
+    // Write -> Shared -> Modified
+    c3->setData(0x804, 0x0A0A, 4);
+    
+    // Write -> Modified -> Modified
+    c3->setData(0x804, 0x0E0E, 4);
+    
+    // Read -> Modified
+    c3->getData(0x804, 4);
     
     // Final print
+    std::cout << std::endl;
     std::cout << "=C1=========================" << std::endl;
     c1->print();
     std::cout << std::endl;

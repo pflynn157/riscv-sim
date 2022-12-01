@@ -1,5 +1,6 @@
 #include <ctime>
 #include <cstdlib>
+#include <cstdio>
 
 #include "bus.hpp"
 
@@ -14,7 +15,7 @@ Bus::Bus() {
 // Adds the cache to the cluster
 //
 void Bus::addCache(Cache *cache) {
-    while (true) {
+    /*while (true) {
         cache->id = rand() % 1001;
         
         bool found = false;
@@ -26,7 +27,7 @@ void Bus::addCache(Cache *cache) {
         }
         
         if (!found) break;
-    }
+    }*/
     
     cache_cluster.push_back(cache);
 }
@@ -61,8 +62,8 @@ void Bus::invalidateCaches(uint32_t address, int id) {
 //
 // Pulls data from a shared cache cluster
 //
-uint32_t Bus::getCacheData(uint32_t address, int size, int pos) {
+std::vector<uint32_t> Bus::getCacheData(uint32_t address, int size, int pos) {
     Cache *c = cache_cluster.at(pos);
-    return c->getData(address, size);
+    return c->getLineData(address);
 }
 

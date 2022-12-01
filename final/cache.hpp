@@ -31,6 +31,7 @@ public:
     bool hasAddress(uint32_t address);
     void invalidate(uint32_t address);
     uint32_t getData(uint32_t address, int size);
+    std::vector<uint32_t> getLineData(uint32_t address);
     bool setData(uint32_t address, uint32_t data, int size);
     
     int id = 0;
