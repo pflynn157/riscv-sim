@@ -170,8 +170,7 @@ uint32_t Cache::getData(uint32_t address, int size) {
         }
         
         // Check the directory
-        // TODO: int pos = bus->checkCacheCluster(address, id);
-        int pos = -1;
+        int pos = dir->checkDirectory(address, id);
         if (pos == -1) {
             printf("[GET %d][INVALID -> EXCLUSIVE]\t Miss -> Fetch from memory\n", id);
             entry->state = CacheState::Exclusive;
@@ -181,6 +180,10 @@ uint32_t Cache::getData(uint32_t address, int size) {
             //
             uint32_t data = 0x0F0F0F0F;
             memcpy(&entry->data[offset], &data, sizeof(uint32_t));
+            
+            // Set the directory
+            printf("[DIRECTORY][UNCACHED -> EXCLUSIVE]\n\n");
+            dir->setLine(address, id);
         } else {
             printf("[GET %d][INVALID -> SHARED]\t Miss -> Fetch from shared cache @ %d\n", id, (pos + 1));
             entry->state = CacheState::Shared;

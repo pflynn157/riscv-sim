@@ -21,10 +21,25 @@ int main(int argc, char **argv) {
     std::cout << std::endl;
     std::cout << std::endl;
     
+    // Read: Uncached -> Exclusive
+    c1->getData(0x804, 4);
+    
+    // Read: Uncached -> Exclusive -> Shared
+    c2->getData(0x800, 4);
+    
+    // Read: Exclusive -> Shared
+    
+    // Write: Uncached -> Exclusive
+    
+    // Write: Shared -> Exclusive
+    
+    
+    /////////////////////////////////////////
     // Test 1
     // Read: Read -> Invalid -> Exclusive
     // Host: Cache 1
-    c1->getData(0x804, 4);
+    
+    //c2->getData(0x804, 4);
     //c3->getData(0x964, 4);
     
     // Read: Read -> Invalid -> Shared
