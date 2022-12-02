@@ -55,47 +55,8 @@ void Cache::print() {
             if (j + 1 < line_size) printf("|");
         }
         
-        printf("][T:%X][", entry->tag);
-        switch (entry->state) {
-            case CacheState::Invalid: printf("INVALID"); break;
-            case CacheState::Exclusive: printf("EXCLUSIVE"); break;
-            case CacheState::Shared: printf("SHARED"); break;
-            case CacheState::Modified: printf("MODIFIED"); break;
-            default: {}
-        }
-        printf("]\n");
+        printf("][T:%X]\n", entry->tag);
     }
-}
-
-//
-// Checks to see if the cache has data at a particular location
-//
-bool Cache::hasAddress(uint32_t address) {
-    // Generate the masks
-    int offset_mask = 0;
-    for (int i = 0; i<offset_width; i++) offset_mask |= (1 << i);
-    
-    int set_mask = 0;
-    for (int i = 0; i<set_width; i++) set_mask |= (1 << i);
-    
-    int tag_mask = 0;
-    for (int i = 0; i<tag_width; i++) tag_mask |= (1 << i);
-    
-    int offset = (address) & offset_mask;
-    int block = (address >> offset_width) & set_mask;
-    int tag = (address >> (set_width + offset_width)) & tag_mask;
-    
-    // Check the cache
-    CacheEntry *entry = cache[block];
-    
-    //printf("[GET ADDR] Tag: %x | Set: %x | Offset: %x | Valid: %d\n", tag, block, offset, entry->valid);
-    
-    // Item in cache
-    if (entry->valid && entry->tag == tag) {
-        return true;
-    }
-    
-    return false;
 }
 
 //
@@ -121,7 +82,6 @@ void Cache::invalidate(uint32_t address) {
     
     // Check the cache
     CacheEntry *entry = cache[block];
-    entry->state = CacheState::Invalid;
     entry->valid = false;
 }
 
@@ -172,9 +132,6 @@ uint32_t Cache::getData(uint32_t address, int size) {
         // Check the directory
         int pos = dir->checkDirectory(address, id);
         if (pos == -1) {
-            printf("[GET %d][INVALID -> EXCLUSIVE]\t Miss -> Fetch from memory\n", id);
-            entry->state = CacheState::Exclusive;
-            
             //
             // This is fake, but pretend we're loading at a particular offset
             //
@@ -182,22 +139,11 @@ uint32_t Cache::getData(uint32_t address, int size) {
             memcpy(&entry->data[offset], &data, sizeof(uint32_t));
             
             // Set the directory
-            printf("[DIRECTORY][UNCACHED -> EXCLUSIVE]\n\n");
+            printf("[GET %d][UNCACHED -> EXCLUSIVE]\t Miss -> Fetch from memory\n", id);
             dir->setLine(address, id);
         } else {
-            printf("[GET %d][INVALID -> SHARED]\t Miss -> Fetch from shared cache @ %d\n", id, (pos + 1));
-            entry->state = CacheState::Shared;
-            
-            //
-            // This to is fake
-            //
-            // TODO: Pull the whole line
-            /*std::vector<uint32_t> cache_line = bus->getCacheData(address, size, pos);
-            int index = 0;
-            for (uint32_t data : cache_line) {
-                memcpy(&entry->data[index], &data, sizeof(uint32_t));
-                index += 4;
-            }*/
+            printf("[GET %d][EXCLUSIVE -> SHARED]\t Miss -> Fetch from shared cache @ %d\n", id, (pos + 1));
+            dir->setLine(address, id, true);
         }
         
         // Return the fetched data
@@ -268,53 +214,25 @@ bool Cache::setData(uint32_t address, uint32_t data, int size) {
     
     // Item in cache
     if (entry->valid && entry->tag == tag) {
-        switch (entry->state) {
-            //
-            // Write -> Exclusive
-            //
-            case CacheState::Exclusive: {
-                entry->state = CacheState::Modified;
-                printf("[SET %d][EXCLUSIVE -> MODIFIED]\t Hit\n", id);
-                memcpy(&entry->data[offset], &data, sizeof(uint8_t)*size);
-            } break;
-            
-            //
-            // Write -> Shared
-            //
-            case CacheState::Shared: {
-                entry->state = CacheState::Modified;
-                printf("[SET %d][SHARED -> MODIFIED]\t Hit\n", id);
-                memcpy(&entry->data[offset], &data, sizeof(uint8_t)*size);
-                //TODO: bus->invalidateCaches(address, id);
-            } break;
-            
-            //
-            // Write -> Modified
-            //
-            case CacheState::Modified: {
-                entry->state = CacheState::Modified;
-                printf("[SET %d][MODIFIED -> MODIFIED]\t Hit\n", id);
-                memcpy(&entry->data[offset], &data, sizeof(uint8_t)*size);
-            } break;
-        }
-        //puts("[SET] Hit");
-        //memcpy(&entry->data[offset], &data, sizeof(uint8_t)*size);
+        printf("[SET %d] Hit\n", id);
+        
+        // Update the directory
+        dir->setLine(address, id, false, true);
     
     // Item not in cache
     } else {
         // Check the other caches
-        entry->state = CacheState::Modified;
         entry->valid = true;
         entry->tag = tag;
         
         // Check the rest of the bus
-        // TODO: int pos = bus->checkCacheCluster(address, id);
-        int pos = -1;
+        int pos = dir->checkDirectory(address, id);
         if (pos == -1) {
             //
             // Pull from RAM
             //
-            printf("[SET %d][INVALID -> MODIFIED]\t Miss -> Pull line from RAM\n", id);
+            printf("[SET %d][UNCACHED -> EXCLUSIVE/MODIFIED]\t Miss -> Pull line from RAM\n", id);
+            dir->setLine(address, id, false, true);
             
             for (int i = 0; i<line_size; i+=4) {
                 uint32_t data2 = 0x0F0F0F0F;
@@ -324,22 +242,13 @@ bool Cache::setData(uint32_t address, uint32_t data, int size) {
             //
             // Pull from shared cache
             //
-            printf("[SET %d][INVALID -> MODIFIED]\t Miss -> Pull from shared cache @ %d\n", id, (pos+1));
+            printf("[SET %d][SHARED -> EXCLUSIVE/MODIFIED]\t Miss -> Pull from shared cache @ %d\n", id, (pos+1));
+            dir->setLine(address, id, false, true);
             
-            // TODO: Should pull the whole line
-            /*std::vector<uint32_t> cache_line = bus->getCacheData(address, size, pos);
-            int index = 0;
-            for (uint32_t data : cache_line) {
-                memcpy(&entry->data[index], &data, sizeof(uint32_t));
-                index += 4;
-            }*/
         }
         
         memcpy(&entry->data[offset], &data, sizeof(uint8_t)*size);
     }
-    
-    // Set RAM
-    //bus->setMemory(address, data);
     
     return false;
 }

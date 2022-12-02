@@ -25,47 +25,28 @@ int main(int argc, char **argv) {
     c1->getData(0x804, 4);
     
     // Read: Uncached -> Exclusive -> Shared
-    c2->getData(0x800, 4);
+    c1->getData(0x964, 4);
+    c2->getData(0x964, 4);
     
-    // Read: Exclusive -> Shared
+    // Read: Shared -> Shared
+    c3->getData(0x964, 4);
     
     // Write: Uncached -> Exclusive
+    c1->setData(0x432, 10, 4);
     
     // Write: Shared -> Exclusive
+    c2->getData(0x348, 4);
+    c4->getData(0x348, 4);
+    c3->setData(0x348, 10, 4);
     
+    // Write: Modified -> Modified
+    c3->setData(0x348, 20, 4);
+    c4->setData(0x348, 20, 4);
     
-    /////////////////////////////////////////
-    // Test 1
-    // Read: Read -> Invalid -> Exclusive
-    // Host: Cache 1
-    
-    //c2->getData(0x804, 4);
-    //c3->getData(0x964, 4);
-    
-    // Read: Read -> Invalid -> Shared
-    //c2->getData(0x804, 4);
-    //c3->getData(0x804, 4);
-    
-    //puts("");
-    
-    //
-    // Write -> Invalid -> Modified
-    //c1->setData(0x932, 10, 4);
-    
-    // Write -> Invalid -> Modified
-    //c2->setData(0x932, 12, 4);
-    
-    // Write -> Exclusive -> Modified
-    //c3->setData(0x964, 10, 4);
-    
-    // Write -> Shared -> Modified
-    //c3->setData(0x804, 0x0A0A, 4);
-    
-    // Write -> Modified -> Modified
-    //c3->setData(0x804, 0x0E0E, 4);
-    
-    // Read -> Modified
-    //c3->getData(0x804, 4);
+    // Read: Modified/Exclusive -> Modified/Exclusive -> Modified/Shared
+    c4->setData(0x496, 20, 4);
+    c4->getData(0x496, 4);
+    c1->getData(0x496, 4);
     
     // Final print
     std::cout << std::endl;
@@ -76,10 +57,10 @@ int main(int argc, char **argv) {
     c2->print();
     std::cout << std::endl;
     std::cout << "=C3=========================" << std::endl;
-    //c3->print();
+    c3->print();
     std::cout << std::endl;
     std::cout << "=C4=========================" << std::endl;
-    //c4->print();
+    c4->print();
     std::cout << std::endl;
     std::cout << "----------------------------" << std::endl;
     dir->print();

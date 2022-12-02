@@ -47,14 +47,18 @@ void Directory::print() {
         printf("%s", ln.c_str());
         
         printf("][Dirty: ");
-        std::string dln = "";
+        /*std::string dln = "";
         for (int i = 0; i<8; i++) {
             uint8_t bit = (dir->dirty >> i) & 0x01;
             dln += std::to_string(bit);
         }
-        printf("%s", dln.c_str());
+        printf("%s", dln.c_str());*/
+        printf("%d", dir->dirty);
         
         printf("][Tag: %d][State: ", dir->tag);
+        if (dir->dirty != 0) {
+            printf("M");
+        }
         switch (dir->state) {
             case State::Exclusive: printf("E"); break;
             case State::Shared: printf("S"); break;
@@ -65,7 +69,7 @@ void Directory::print() {
     }
 }
 
-void Directory::setLine(uint32_t address, uint8_t pos) {
+void Directory::setLine(uint32_t address, uint8_t pos, bool shared, bool write) {
     // Generate the masks
     int offset_mask = 0;
     for (int i = 0; i<offset_width; i++) offset_mask |= (1 << i);
@@ -84,15 +88,18 @@ void Directory::setLine(uint32_t address, uint8_t pos) {
     DirEntry *entry = directory[block];
     
     // Update directory
-    if (entry->tag == tag) {
-        //entry->state = State::Shared;
-        //entry->lines |= 1 << (pos - 1);
+    if (entry->tag == tag && shared) {
+        entry->state = State::Shared;
+        entry->lines |= 1 << (pos - 1);
     
     // Doesn't exist in directory
     } else {
         entry->tag = tag;
         entry->state = State::Exclusive;
-        entry->lines |= 1 << (pos - 1);
+        entry->lines = 1 << (pos - 1);
+        if (write) {
+            entry->dirty = pos;
+        }
     }
 }
 
@@ -119,7 +126,10 @@ int Directory::checkDirectory(uint32_t address, uint8_t pos) {
             uint8_t pos2 = entry->lines;
             return pos2;
         } else if (entry->state == State::Shared) {
-        
+            for (int i = 0; i<8; i++) {
+                uint8_t pos2 = (entry->lines >> i) & 0x01;
+                if (pos2 == 1) return i;
+            }
         }
     }
     
