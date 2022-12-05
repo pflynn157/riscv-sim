@@ -22,30 +22,43 @@ int main(int argc, char **argv) {
     std::cout << std::endl;
     
     // Read: Uncached -> Exclusive
+    std::cout << "Address: " << 0x804 << std::endl;
     c1->getData(0x804, 4);
     
     // Read: Uncached -> Exclusive -> Shared
+    std::cout << "Address: " << 0x964 << std::endl;
     c1->getData(0x964, 4);
+    std::cout << "Address: " << 0x964 << std::endl;
     c2->getData(0x964, 4);
     
     // Read: Shared -> Shared
+    std::cout << "Address: " << 0x964 << std::endl;
     c3->getData(0x964, 4);
     
     // Write: Uncached -> Exclusive
+    std::cout << "Address: " << 0x432 << std::endl;
     c1->setData(0x432, 10, 4);
     
     // Write: Shared -> Exclusive
+    std::cout << "Address: " << 0x348 << std::endl;
     c2->getData(0x348, 4);
+    std::cout << "Address: " << 0x348 << std::endl;
     c4->getData(0x348, 4);
+    std::cout << "Address: " << 0x348 << std::endl;
     c3->setData(0x348, 10, 4);
     
     // Write: Modified -> Modified
+    std::cout << "Address: " << 0x348 << std::endl;
     c3->setData(0x348, 20, 4);
+    std::cout << "Address: " << 0x348 << std::endl;
     c4->setData(0x348, 20, 4);
     
     // Read: Modified/Exclusive -> Modified/Exclusive -> Modified/Shared
+    std::cout << "Address: " << 0x496 << std::endl;
     c4->setData(0x496, 20, 4);
+    std::cout << "Address: " << 0x496 << std::endl;
     c4->getData(0x496, 4);
+    std::cout << "Address: " << 0x496 << std::endl;
     c1->getData(0x496, 4);
     
     // Final print

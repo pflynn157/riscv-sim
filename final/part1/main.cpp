@@ -24,32 +24,42 @@ int main(int argc, char **argv) {
     // Test 1
     // Read: Read -> Invalid -> Exclusive
     // Host: Cache 1
+    std::cout << std::endl << "Address: " << 0x804 << std::endl;
     c1->getData(0x804, 4);
+    std::cout << std::endl << "Address: " << 0x964 << std::endl;
     c3->getData(0x964, 4);
     
     // Read: Read -> Invalid -> Shared
+    std::cout << std::endl << "Address: " << 0x804 << std::endl;
     c2->getData(0x804, 4);
+    std::cout << std::endl << "Address: " << 0x804 << std::endl;
     c3->getData(0x804, 4);
     
     puts("");
     
     //
     // Write -> Invalid -> Modified
+    std::cout << std::endl << "Address: " << 0x932 << std::endl;
     c1->setData(0x932, 10, 4);
     
     // Write -> Invalid -> Modified
+    std::cout << std::endl << "Address: " << 0x932 << std::endl;
     c2->setData(0x932, 12, 4);
     
     // Write -> Exclusive -> Modified
+    std::cout << std::endl << "Address: " << 0x964 << std::endl;
     c3->setData(0x964, 10, 4);
     
     // Write -> Shared -> Modified
+    std::cout << std::endl << "Address: " << 0x804 << std::endl;
     c3->setData(0x804, 0x0A0A, 4);
     
     // Write -> Modified -> Modified
+    std::cout << std::endl << "Address: " << 0x804 << std::endl;
     c3->setData(0x804, 0x0E0E, 4);
     
     // Read -> Modified
+    std::cout << std::endl << "Address: " << 0x804 << std::endl;
     c3->getData(0x804, 4);
     
     // Final print
