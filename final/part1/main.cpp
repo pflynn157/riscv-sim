@@ -5,10 +5,10 @@
 
 int main(int argc, char **argv) {
     Bus *bus = new Bus;
-    Cache *c1 = new Cache(256, 32);
-    Cache *c2 = new Cache(256, 32);
-    Cache *c3 = new Cache(256, 32);
-    Cache *c4 = new Cache(256, 32);
+    Cache *c1 = new Cache(64, 16);
+    Cache *c2 = new Cache(64, 16);
+    Cache *c3 = new Cache(64, 16);
+    Cache *c4 = new Cache(64, 16);
     c1->id = 1;
     c2->id = 2;
     c3->id = 3;
